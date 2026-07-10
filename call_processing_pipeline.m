@@ -4,7 +4,7 @@ filedir = '\\macaw.ucsf.edu\users\public\mikey_public\female_preference\wh26wh27
 birdname = 'wh26wh27'; %'or87yw46'; %'wh37gr58';
 sex = 'female';
 
-savedir = 'D:\Brainard\Analysis\Female preference\';
+savedir = 'D:\Brainard\Analysis\Female preference\'; % base folder for saved files
 
 %% SCREENING
 
@@ -24,7 +24,7 @@ savedir = 'D:\Brainard\Analysis\Female preference\';
 
         PhenotypeBird(birdname)
 
-        %% evsonganaly
+        %% Check on evsonganaly
 
         evsonganaly
         

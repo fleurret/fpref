@@ -30,3 +30,9 @@ for f = 1:length(d)
         WhispSegFile(Ch2Name)
     end
 end
+
+% copy over the OnsetLog also
+ts = dir(fullfile(filedir, session, '*.txt'));
+ts = ts(contains([ts.name], 'OnsetLog'));
+
+copyfile(fullfile(ts.folder, ts.name), fullfile(savedir, birdname, 'testing', session, ts.name))

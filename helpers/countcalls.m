@@ -33,6 +33,11 @@ switch sv
         
         % load timestamps
         ts = dir(fullfile(d, '*.txt'));
+        
+        if isempty(ts)
+            error('Timestamps file is missing :(')
+        end
+        
         timestamps = readtable(fullfile(ts.folder, ts.name));
         
         % sessions
