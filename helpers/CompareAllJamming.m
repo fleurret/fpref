@@ -556,8 +556,6 @@ for f = 1:length(d)
         end
         %   end;
         
-        
-        
     end
     
     if exist("badoutputs")

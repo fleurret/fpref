@@ -17,3 +17,5 @@ savedir = 'D:\Brainard\Analysis\Female preference';
         %     'load' previously saved CSV file if you just want plots
 
         countcalls(savedir, birdname, 'load')
+
+        
