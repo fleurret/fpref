@@ -1,2 +1,0 @@
-function splitjamch(savedir, birdname)
-
