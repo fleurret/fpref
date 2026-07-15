@@ -1,7 +1,7 @@
 %% SET VARIABLES
 
-filedir = '\\macaw.ucsf.edu\users\public\mikey_public\female_preference\wh26wh27\exp_data';
-birdname = 'wh26wh27'; %'or87yw46'; %'wh37gr58';
+filedir = '\\macaw.ucsf.edu\users\public\mikey_public\female_preference\rd47yw4\exp_data';
+birdname = 'rd47yw4'; %'or87yw46'; %'wh37gr58';
 sex = 'female';
 
 savedir = 'D:\Brainard\Analysis\Female preference\'; % base folder for save files
@@ -34,16 +34,11 @@ savedir = 'D:\Brainard\Analysis\Female preference\'; % base folder for save file
         
         SplitandSeg(filedir, savedir, birdname)
         
-        %% Check to make sure everything is labeled
-        
-        evsonganaly
-        
         %% Compare channels
         
-        CompareAllJamming(savedir, birdname)
+        CompareAllJamming(savedir, birdname, 0.01)
         
-        %% Check again?
+        %% Check for missing/mislabeled calls
         
         evsonganaly
-        
-        
+                    

@@ -1,10 +1,8 @@
-function CompareAllJamming(savedir, birdname)
+function CompareAllJamming(savedir, birdname, SnippetSubsampleDur)
 
 %load Burdies;
 %E:\Data\DyadTest\female_male\dyad4-gr2bu30pk99rd81_Box1
 % \2024\_06\_30\20240630091431.wav
-
-SnippetSubsampleDur=0.009; % Break into 9ms samples- can adjust resolution here.
 
 d = uigetfile_n_dir(fullfile(savedir, birdname, 'testing'));
 
@@ -19,24 +17,25 @@ for f = 1:length(d)
     bname=currdirname(startidx(1):endidx(1));
     bname2='playback';
     
-%     try
-%         rmdir('./cmpJamm/','s')
-%     catch
-%     end
+    try
+        rmdir('./cmpJamm/','s')
+    catch
+    end
     
     if ~isfolder("./cmpJamm/")
         mkdir('./cmpJamm/')
     end
     
-    alldirs=dir(bname);
-    Burd1=dir("\**\*Ch1.wav.not.mat");
-    Burd2=dir("\**\*Ch2.wav.not.mat");
+%     alldirs=dir(bname);
+    Burd = dir(currdirname);
+    Burd1= Burd(contains({Burd.name}, 'Ch1.wav.not.mat'));
+    Burd2 = Burd(contains({Burd.name}, 'Ch2.wav.not.mat'));
     
-    for i=3:length(alldirs)
-        if alldirs(i).isdir
-            mkdir('./cmpJamm/'+string(alldirs(i).name));
-        end
-    end
+%     for i=3:length(alldirs)
+%         if alldirs(i).isdir
+%             mkdir('./cmpJamm/'+string(alldirs(i).name));
+%         end
+%     end
     
     clear badoutputs;
     badcnt=1;
@@ -100,7 +99,7 @@ for f = 1:length(d)
             [audiochannel2 fs2]=audioread(wavfile2);
         end
         
-        pad=zeros(3*fs,1);
+        pad=zeros(3*fs,1); % ?? why
         rawaudiochannel2=bandpass(audiochannel2, [300 10000], fs);
         rawaudiochannel1=bandpass(audiochannel1, [300 10000], fs2);
         
@@ -506,6 +505,13 @@ for f = 1:length(d)
         
         NotMat2.onsets=sort((onsets2))/(fs/1000);
         NotMat2.offsets=sort((offsets2))/(fs/1000);
+        
+        % make sure number of labels match for evsonanaly
+        % right now we dont really care what the labels are
+        if length(NotMat1.labels) ~= length(NotMat1.onsets)
+            NotMat1.labels = NotMat1.labels(1:length(NotMat1.onsets));
+        end
+        
         try
             [issongfile1 iscallfile1 iscontig1]=checkforsong(NotMat1.onsets,NotMat1.offsets,4,500);
             [issongfile2 iscallfile2 iscontig2]=checkforsong(NotMat2.onsets,NotMat2.offsets,4,500);

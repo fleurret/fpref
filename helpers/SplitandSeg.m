@@ -9,6 +9,10 @@ for f = 1:length(d)
     dd = split(d(f), '\');
     session = cell2mat(dd(contains(dd, 'session')));
     
+    if ~isfolder(fullfile(savedir, birdname))
+        mkdir(fullfile(savedir, birdname))
+    end
+
     try
         cd(fullfile(savedir, birdname, 'testing', session))
     catch ME
@@ -29,10 +33,10 @@ for f = 1:length(d)
         WhispSegFile(Ch1Name)
         WhispSegFile(Ch2Name)
     end
+    
+    % copy over the OnsetLog also
+    ts = dir(fullfile(filedir, session, '*.txt'));
+    ts = ts(contains([ts.name], 'OnsetLog'));
+    
+    copyfile(fullfile(ts.folder, ts.name), fullfile(savedir, birdname, 'testing', session, ts.name))
 end
-
-% copy over the OnsetLog also
-ts = dir(fullfile(filedir, session, '*.txt'));
-ts = ts(contains([ts.name], 'OnsetLog'));
-
-copyfile(fullfile(ts.folder, ts.name), fullfile(savedir, birdname, 'testing', session, ts.name))
