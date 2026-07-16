@@ -36,7 +36,7 @@ savedir = 'D:\Brainard\Analysis\Female preference\'; % base folder for save file
         
         %% Compare channels
         
-        CompareAllJamming(savedir, birdname, 0.01)
+        CompareAllJamming(savedir, birdname, 0.02)
         
         %% Check for missing/mislabeled calls
         

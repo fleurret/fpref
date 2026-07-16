@@ -26,16 +26,16 @@ for f = 1:length(d)
         mkdir('./cmpJamm/')
     end
     
-%     alldirs=dir(bname);
+    %     alldirs=dir(bname);
     Burd = dir(currdirname);
     Burd1= Burd(contains({Burd.name}, 'Ch1.wav.not.mat'));
     Burd2 = Burd(contains({Burd.name}, 'Ch2.wav.not.mat'));
     
-%     for i=3:length(alldirs)
-%         if alldirs(i).isdir
-%             mkdir('./cmpJamm/'+string(alldirs(i).name));
-%         end
-%     end
+    %     for i=3:length(alldirs)
+    %         if alldirs(i).isdir
+    %             mkdir('./cmpJamm/'+string(alldirs(i).name));
+    %         end
+    %     end
     
     clear badoutputs;
     badcnt=1;
@@ -97,6 +97,18 @@ for f = 1:length(d)
         try
             [audiochannel1 fs]=audioread(wavfile1);
             [audiochannel2 fs2]=audioread(wavfile2);
+        end
+        
+        % is there a delay?
+        [sims, lags] = xcorr(audiochannel1, audiochannel2);
+        [~, idx] = max(abs(sims));
+        delay = lags(idx);
+        
+        if delay > 0
+            audiochannel2 = [zeros(delay, 1); audiochannel2(1:end-delay)];
+        elseif delay < 0
+            delay = abs(delay);
+            audiochannel1 = [zeros(delay, 1); audiochannel1(1:end-delay)];
         end
         
         pad=zeros(3*fs,1); % ?? why
@@ -448,9 +460,9 @@ for f = 1:length(d)
         onsets2(badonset)=[];
         offsets2(badoffset)=[];
         
-%         audioout=[pad; rawaudiochannel1; pad];
-%         audioout(:,2)=[pad; rawaudiochannel2; pad];
-%         audioout(:,3)=[pad; outputs(1:length(rawaudiochannel1)); pad];
+        %         audioout=[pad; rawaudiochannel1; pad];
+        %         audioout(:,2)=[pad; rawaudiochannel2; pad];
+        %         audioout(:,3)=[pad; outputs(1:length(rawaudiochannel1)); pad];
         
         audioout=[rawaudiochannel1];
         audioout(:,2)=[rawaudiochannel2];
@@ -469,7 +481,7 @@ for f = 1:length(d)
             tempout(onsets1(kk):offsets1(kk))=1;
         end
         
-%         audioout(:,4)=[pad; tempout(1:length(rawaudiochannel1)); pad];
+        %         audioout(:,4)=[pad; tempout(1:length(rawaudiochannel1)); pad];
         audioout(:,4)=[tempout(1:length(rawaudiochannel1))];
         
         idx=find((onsets2(2:end)-offsets2(1:end-1))< mingap );
@@ -481,7 +493,7 @@ for f = 1:length(d)
             tempout(onsets2(kk):offsets2(kk))=1;
         end
         
-%         audioout(:,5)=[pad; tempout(1:length(rawaudiochannel1)); pad];
+        %         audioout(:,5)=[pad; tempout(1:length(rawaudiochannel1)); pad];
         audioout(:,5)=[tempout(1:length(rawaudiochannel1))];
         
         tempout=zeros(length(rawaudiochannel1),1);
@@ -489,7 +501,7 @@ for f = 1:length(d)
             tempout(jamonsets1(kk):jamoffsets1(kk))=1;
         end
         
-%         audioout(:,6)=[pad; tempout(1:length(rawaudiochannel1)); pad];
+        %         audioout(:,6)=[pad; tempout(1:length(rawaudiochannel1)); pad];
         audioout(:,6)=[tempout(1:length(rawaudiochannel1))];
         
         tempout=zeros(length(rawaudiochannel1),1);
@@ -497,7 +509,7 @@ for f = 1:length(d)
             tempout(jamonsets2(kk):jamoffsets2(kk))=1;
         end
         
-%         audioout(:,7)=[pad; tempout(1:length(rawaudiochannel1)); pad];
+        %         audioout(:,7)=[pad; tempout(1:length(rawaudiochannel1)); pad];
         audioout(:,7)=[tempout(1:length(rawaudiochannel1))];
         
         NotMat1.onsets=sort((onsets1))/(fs/1000);
@@ -525,44 +537,44 @@ for f = 1:length(d)
         %     keyboard
         % end;
         
-        if ((length(onsets2)+length(onsets1)>2)) % Are there at least 2 calls? Otherwise, nothing to analyse.
-            
-            if ~isfolder("./cmpJamm/Ch1")
-                mkdir(fullfile('./cmpJamm/', 'Ch1'))
-            end
-            
-            if ~isfolder("./cmpJamm/Ch2")
-                mkdir(fullfile('./cmpJamm/', 'Ch2'))
-            end
-            
-            %   if Jam==true;
-            if (iscontig1 | iscontig2)
-                audiowrite("./cmpJamm/" + fil1(1:end-8),audioout,fs2);
-                save("./cmpJamm/"+ fil1(1:end-8)+".songs.mat","NotMat1","NotMat2","jamonsets1","jamonsets2",'jamoffsets2','jamoffsets1')
-                
-                % save separate .not.mats for channels               
-                audiowrite("./cmpJamm/Ch1/" + fil1(1:end-8),audioout,fs);
-                save("./cmpJamm/Ch1/" + fil1(1:end-8)+".songs.not.mat", '-struct', 'NotMat1')
-                
-                audiowrite("./cmpJamm/Ch2/" + fil2(1:end-8),audioout,fs2);
-                save("./cmpJamm/Ch2/" + fil2(1:end-8)+".songs.not.mat", '-struct', 'NotMat2')
-                
-            else %if (iscallfile1 && iscallfile2)
-                audiowrite("./cmpJamm/"+ fil1(1:end-8),audioout,fs2);
-                save("./cmpJamm/" + fil1(1:end-8)+".calls.mat","NotMat1","NotMat2","jamonsets1","jamonsets2",'jamoffsets2','jamoffsets1')
-                % keyboard
-                
-                % save separate .not.mats for channels
-                audiowrite("./cmpJamm/Ch1/" + fil1(1:end-8),audioout,fs);
-                save("./cmpJamm/Ch1/" + fil1(1:end-8)+".calls.not.mat", '-struct', 'NotMat1')
-                
-                audiowrite("./cmpJamm/Ch2/" + fil2(1:end-8),audioout,fs2);
-                save("./cmpJamm/Ch2/" + fil2(1:end-8)+".calls.not.mat", '-struct', 'NotMat2')
-            end
-        end
-        %   end;
+        %         if ((length(onsets2)+length(onsets1)>2)) % Are there at least 2 calls? Otherwise, nothing to analyse.
         
+        if ~isfolder("./cmpJamm/Ch1")
+            mkdir(fullfile('./cmpJamm/', 'Ch1'))
+        end
+        
+        if ~isfolder("./cmpJamm/Ch2")
+            mkdir(fullfile('./cmpJamm/', 'Ch2'))
+        end
+        
+        %   if Jam==true;
+        if (iscontig1 | iscontig2)
+            audiowrite("./cmpJamm/" + fil1(1:end-8),audioout,fs2);
+            save("./cmpJamm/"+ fil1(1:end-8)+".songs.mat","NotMat1","NotMat2","jamonsets1","jamonsets2",'jamoffsets2','jamoffsets1')
+            
+            % save separate .not.mats for channels
+            audiowrite("./cmpJamm/Ch1/" + fil1(1:end-8),audioout,fs);
+            save("./cmpJamm/Ch1/" + fil1(1:end-8)+".songs.not.mat", '-struct', 'NotMat1')
+            
+            audiowrite("./cmpJamm/Ch2/" + fil2(1:end-8),audioout,fs2);
+            save("./cmpJamm/Ch2/" + fil2(1:end-8)+".songs.not.mat", '-struct', 'NotMat2')
+            
+        else %if (iscallfile1 && iscallfile2)
+            audiowrite("./cmpJamm/"+ fil1(1:end-8),audioout,fs2);
+            save("./cmpJamm/" + fil1(1:end-8)+".calls.mat","NotMat1","NotMat2","jamonsets1","jamonsets2",'jamoffsets2','jamoffsets1')
+            % keyboard
+            
+            % save separate .not.mats for channels
+            audiowrite("./cmpJamm/Ch1/" + fil1(1:end-8),audioout,fs);
+            save("./cmpJamm/Ch1/" + fil1(1:end-8)+".calls.not.mat", '-struct', 'NotMat1')
+            
+            audiowrite("./cmpJamm/Ch2/" + fil2(1:end-8),audioout,fs2);
+            save("./cmpJamm/Ch2/" + fil2(1:end-8)+".calls.not.mat", '-struct', 'NotMat2')
+        end
     end
+    %   end;
+    
+    %     end
     
     if exist("badoutputs")
         save('badoutputs.mat',"badoutputs");

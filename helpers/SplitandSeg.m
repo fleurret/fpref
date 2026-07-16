@@ -26,10 +26,19 @@ for f = 1:length(d)
         [dat fs] = audioread(fullfile(fnames(i).folder,fnames(i).name));
         Ch1Dat = dat(:,1);
         Ch2Dat = dat(:,3);
+        
+        % lets try to filter Ch1 to help whisperseg
+        if ~contains(fnames(i).name, 'Post')
+            Ch1out = filterch(Ch1Dat, Ch2Dat);
+        else
+            Ch1out = Ch1Dat;
+        end
+        
         Ch1Name = replace(fnames(i).name,'.wav','Ch1.wav');
         Ch2Name = replace(fnames(i).name,'.wav','Ch2.wav');
-        audiowrite(Ch1Name,Ch1Dat,fs)
+        audiowrite(Ch1Name,Ch1out,fs)
         audiowrite(Ch2Name,Ch2Dat,fs)
+
         WhispSegFile(Ch1Name)
         WhispSegFile(Ch2Name)
     end
