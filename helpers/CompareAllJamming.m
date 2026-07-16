@@ -108,7 +108,7 @@ for f = 1:length(d)
             audiochannel2 = [zeros(delay, 1); audiochannel2(1:end-delay)];
         elseif delay < 0
             delay = abs(delay);
-            audiochannel1 = [zeros(delay, 1); audiochannel1(1:end-delay)];
+            audiochannel2 = [audiochannel2(delay+1:end); zeros(delay,1)];
         end
         
         pad=zeros(3*fs,1); % ?? why
