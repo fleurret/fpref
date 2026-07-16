@@ -2,7 +2,7 @@ function filtCh1 = filterch(Ch1, Ch2)
 
 % equalize gain
 gain = rms(Ch1) / rms(Ch2);
-Ch2 = Ch2 * (gain*2);
+Ch2 = Ch2 * gain;
 
 % is there a delay?
 [sims, lags] = xcorr(Ch1, Ch2);
