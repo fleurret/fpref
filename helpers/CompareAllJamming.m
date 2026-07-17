@@ -28,7 +28,7 @@ for f = 1:length(d)
     
     %     alldirs=dir(bname);
     Burd = dir(currdirname);
-    Burd1= Burd(contains({Burd.name}, 'Ch1.wav.not.mat'));
+    Burd1= Burd(contains({Burd.name}, 'Ch1filtered.wav.not.mat'));
     Burd2 = Burd(contains({Burd.name}, 'Ch2.wav.not.mat'));
     
     %     for i=3:length(alldirs)
@@ -129,10 +129,10 @@ for f = 1:length(d)
         %h=gausswin(len);
         
         % Square + Filter songs.
-        squared_song = rawaudiochannel1.^2;
-        audiochannel1 = conv(h, squared_song);
-        offset = round((length(audiochannel1)-length(rawaudiochannel1))/2);
-        audiochannel1=audiochannel1(1+offset:length(rawaudiochannel1)+offset);
+%         squared_song = rawaudiochannel1.^2;
+%         audiochannel1 = conv(h, squared_song);
+%         offset = round((length(audiochannel1)-length(rawaudiochannel1))/2);
+%         audiochannel1=audiochannel1(1+offset:length(rawaudiochannel1)+offset);
         
         squared_song = rawaudiochannel2.^2;
         audiochannel2 = conv(h, squared_song);

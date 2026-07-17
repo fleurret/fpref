@@ -35,7 +35,9 @@ for f = 1:length(d)
         end
         
         Ch1Name = replace(fnames(i).name,'.wav','Ch1.wav');
+        Ch1oName = replace(fnames(i).name,'.wav','Ch1nofilter.wav');
         Ch2Name = replace(fnames(i).name,'.wav','Ch2.wav');
+        audiowrite(Ch1oName,Ch1Dat,fs)
         audiowrite(Ch1Name,Ch1out,fs)
         audiowrite(Ch2Name,Ch2Dat,fs)
 
