@@ -110,8 +110,7 @@ switch sv
                     
                     % add postblock calls to the right place
                     postblockcalls = length(call_onsets(call_onsets > block_offset));
-                    postblock = contains(blockdata.Block, block) & contains(blockdata.BlockType, 'PostBlock');
-                    blockdata(postblock,:).NumCalls = blockdata(postblock,:).NumCalls + postblockcalls;
+                    postblock = blockdata(contains(blockdata.Block, block) & contains(blockdata.BlockType, 'PostBlock'),:);
                 end
             end
             
@@ -124,11 +123,7 @@ switch sv
         fprintf(' done\n')
 end
 
-if ismatrix(D.Session)
-    D.Session = string(D.Session);
-end
-
-sessions = str2double(sort(unique(D.Session)));
+sessions = sort(str2double(unique(D.Session)));
 stims = unique(D.Stimulus);
 
 % plot across sessions
@@ -149,18 +144,19 @@ for i = 1:length(sessions)
         Y(j,:) = flip(stimulusdata.NumCalls');
     end
     
-    ax(i) = nexttile;
+    nexttile
+    ax = gca;
     
-    set(ax(i), 'TickDir', 'out',...
+    set(ax, 'TickDir', 'out',...
         'XTickLabelRotation', 0,...
         'TickLength', [0.02,0.02],...
         'LineWidth', 1.5);
-    set(findobj(ax(i),'-property','FontName'),...
+    set(findobj(ax,'-property','FontName'),...
         'FontSize', 9,...
         'FontName','Arial')
     hold on
     
-    b = bar(ax(i), X, Y,...
+    b = bar(ax, X, Y,...
         'LineStyle', 'none');
     set(b(1),...
         'FaceColor', cm(1,:))
@@ -171,12 +167,12 @@ for i = 1:length(sessions)
     ylabel(ax,'Calls',...
         'FontWeight', 'bold')
     title(['Session ', num2str(i)])
-    set(ax(i) ,'Layer', 'Top')
+    set(ax ,'Layer', 'Top')
 end
 
-legend(ax(i),...
+legend(ax,...
     'Block', 'PostBlock')
-legend(ax(i), 'boxoff')
+legend(ax, 'boxoff')
 linkaxes(ax, 'y')
 sgtitle(birdname)
 

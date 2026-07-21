@@ -42,7 +42,7 @@ savedir = 'D:\Brainard\Analysis\Female preference\'; % base folder for save file
         % SnippetSubSampleDur: in s
         % sqf: square and filter songs (0: no, 1: yes)
         
-        CompareAllJamming(savedir, birdname, 0.02, 0)
+        CompareAllJamming(savedir, birdname, 0.02, 1)
         
         %% Compare channels for specific files
         % select individual .wav files (whichever channel for each block)

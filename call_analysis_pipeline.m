@@ -1,6 +1,6 @@
 %% SET VARIABLES
 
-birdname = 'wh26wh27'; %'wh37gr58';
+birdname = 'rd47yw4';
 savedir = 'D:\Brainard\Analysis\Female preference';
 
 %% ANALYSIS
@@ -14,7 +14,7 @@ savedir = 'D:\Brainard\Analysis\Female preference';
         % sv: 'save' a CSV file for new subject
         %     'load' previously saved CSV file if you just want plots
 
-        countcalls(savedir, birdname, 'save')
+        countcalls(savedir, birdname, 'load')
         
         %% Count lobes
         
