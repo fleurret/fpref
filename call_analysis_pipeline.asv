@@ -1,23 +1,20 @@
 %% SET VARIABLES
 
-birdname = 'or87yw46';
-    %'wh26wh27'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
+birdname = 'or87yw46'; 'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
 savedir = 'D:\Brainard\Analysis\Female preference';
 
 %% ANALYSIS
         
         %% Count number of calls for each stimulus
         % saves a CSV file with number of calls for each block/postblock in
-        % each session
-        % plots block/postblock calls by session;
-        %       total block + postblock calls across sessions
-        %       call persistence across sessions
+        % each session; plots block/postblock calls by session; plots total 
+        % block + postblock calls across sessions
         
         % countcalls(savedir, birdname, sv)
         % sv: 'save' a CSV file for new subject
         %     'load' previously saved CSV file if you just want plots
 
-        countcalls(savedir, birdname, 'save')
+        countcalls(savedir, birdname, 'load')
         
         %% Count lobes
         % TBD

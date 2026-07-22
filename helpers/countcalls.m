@@ -28,9 +28,10 @@ switch sv
         sessions = sessions([sessions.isdir]);
         
         % table headers
-        headers = {'Subject', 'Session', 'Stimulus', 'Block', 'BlockType', 'NumCalls'};
+        headers = {'Subject', 'Session', 'Stimulus', 'Block',...
+            'BlockType', 'NumCalls', 'Q1Pct', 'Q2Pct', 'Q3Pct', 'Q4Pct'};
         D = [];
-               
+        
         % sessions
         for i = 1:length(sessions)
             
@@ -54,11 +55,12 @@ switch sv
             callfiles = dir(sd);
             callfiles = callfiles(~ismember({callfiles.name}, {'.','..'}));
             callfiles = callfiles(~endsWith({callfiles.name}, '.wav'));
+            callfiles = callfiles(~contains({callfiles.name}, 'OnsetLog'));
             
             % create tables
-            blockdata = table('size',[length(callfiles) 6],...
-                'variabletypes',["string","string","string","string","string","double"],...
-                'variablenames',headers);
+            blockdata = table('size',[length(callfiles) 10],...
+                'variabletypes',["string","string","string","string","string","double","double","double","double","double"],...
+                'variablenames', headers);
             
             % load file
             for j = 1:length(callfiles)
@@ -79,7 +81,10 @@ switch sv
                     blockdata(j,:).Block = block;
                     blockdata(j,:).BlockType = 'PostBlock';
                     blockdata(j,:).NumCalls = length(data.onsets);
-                    
+                    blockdata(j,:).Q1Pct = NaN;
+                    blockdata(j,:).Q2Pct = NaN;
+                    blockdata(j,:).Q3Pct = NaN;
+                    blockdata(j,:).Q4Pct = NaN;
                 else
                     
                     % match timestamps
@@ -95,18 +100,28 @@ switch sv
                     block_offset = timestamps.timestamp_HH_MM_SS_mmm_(brow+2);
                     
                     % remove preblock calls
-                    call_onsets = duration(seconds(sort(data.onsets)/1000), 'format', 'hh:mm:ss.SSS');
+                    onsets = sort(data.onsets);
+                    call_onsets = duration(seconds(onsets/1000), 'format', 'hh:mm:ss.SSS');
                     call_onsets = call_onsets(call_onsets > block_onset);
                     
                     % remove postblock calls
                     calls = call_onsets(call_onsets < block_offset);
-
+                    
                     blockdata(j,:).Subject = birdname;
                     blockdata(j,:).Session = session;
                     blockdata(j,:).Stimulus = stimulus;
                     blockdata(j,:).Block = block;
                     blockdata(j,:).BlockType = 'Block';
-                    blockdata(j,:).NumCalls = length(call_onsets);
+                    blockdata(j,:).NumCalls = length(calls);
+                    
+                    % calculate call consistency
+                    quarterblock = (block_offset - block_onset)/4;
+                    q = block_onset:quarterblock:block_offset;
+                    
+                    blockdata(j,:).Q1Pct = (sum(calls <= q(2) & calls > q(1))/length(calls))*100;
+                    blockdata(j,:).Q2Pct = (sum(calls <= q(3) & calls > q(2))/length(calls))*100;
+                    blockdata(j,:).Q3Pct = (sum(calls <= q(4) & calls > q(3))/length(calls))*100;
+                    blockdata(j,:).Q4Pct = (sum(calls <= q(5) & calls > q(4))/length(calls))*100;
                     
                     % add postblock calls to the right place
                     postblockcalls = length(call_onsets(call_onsets > block_offset));
@@ -128,7 +143,7 @@ if ismatrix(D.Session)
     D.Session = string(D.Session);
 end
 
-sessions = str2double(sort(unique(D.Session)));
+sessions = sort(str2double(unique(D.Session)));
 stims = unique(D.Stimulus);
 
 % plot across sessions
@@ -189,48 +204,103 @@ fprintf(' done\n')
 
 clear f
 
-% total for each stimulus
-headers = {'Subject', 'Stimulus', 'TotalCalls'};
-
-C = table('size',[length(stims) 3],...
-    'variabletypes',["string","string","double"],...
-    'variablenames',headers);
-
-for i = 1:length(stims)
-    stimulusdata = D(contains(D.Stimulus, stims(i)),:);
-    
-    C(i,:).Subject = birdname;
-    C(i,:).Stimulus = stims(i);
-    C(i,:).TotalCalls = sum(stimulusdata.NumCalls);
-end
-
 % plot total calls
 f = figure;
 f.Position = [0, 0, 500, 300];
-hold on
+tiledlayout(2, 1,...
+    'Padding', 'compact',...
+    'TileSpacing', 'compact');
 
-ax = gca;
-set(ax, 'TickDir', 'out',...
-    'XTickLabelRotation', 0,...
-    'TickLength', [0.02,0.02],...
-    'LineWidth', 1.5);
-set(findobj(ax,'-property','FontName'),...
-    'FontSize', 9,...
-    'FontName','Arial')
+ax(1) = nexttile;
 
-X = 1:length(C.Stimulus);
-Y = C.TotalCalls;
+% total for each stimulus
+for i = 1:length(stims)
+    hold on
+    stimulusdata = D(contains(D.Stimulus, stims(i)),:);
+    
+    postblock = stimulusdata(contains(stimulusdata.BlockType, 'Post'),:);
+    block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
+    
+    calls = [sum(block.NumCalls) sum(postblock.NumCalls)];
+    b = bar(ax(1), i, calls, 'stacked',...
+        'LineStyle', 'none');
+    set(b(1),...
+        'FaceColor', cm(1,:))
+    set(b(2),...
+        'FaceColor', cm(2,:))
+end
 
-bar(ax, X, Y,...
-    'FaceColor', cm(1,:),...
-    'LineStyle', 'none')
-
-set(ax ,'Layer', 'Top')
 xticks(1:length(stims))
 xticklabels(stims)
-ylabel(ax,'Total calls',...
+ylabel(ax(1),'Total calls',...
     'FontWeight', 'bold')
-title(birdname)
+
+% as a percentage
+ax(2) = nexttile;
+hold on
+
+C = [];
+
+for i = 1:length(sessions)
+    sessiondata = D(str2double(D.Session) == sessions(i),:);
+    allsessioncalls = sum(sessiondata.NumCalls);
+    
+    sessiondata.PctCalls = (sessiondata.NumCalls/allsessioncalls)*100;
+    C = [C; sessiondata];
+end
+
+for i = 1:length(stims)
+    stimulusdata = C(contains(C.Stimulus, stims(i)),:);
+    
+    postblock = stimulusdata(contains(stimulusdata.BlockType, 'Post'),:);
+    block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
+    
+    bcallpct(i) = sum(block.NumCalls)/height(block);
+    bsem(i) = std(block.NumCalls)/sqrt(height(block));
+    pbcallpct(i) = sum(postblock.NumCalls)/height(postblock);
+    pbsem(i) = std(postblock.NumCalls)/sqrt(height(postblock));
+end
+
+errorbar(ax(2), 1:length(stims), bcallpct, bsem,...
+    'Marker', 'o',...
+    'MarkerSize', 8,...
+    'MarkerFaceColor', cm(1,:),...
+    'Color', cm(1,:),...
+    'LineWidth', 1.5,...
+    'CapSize', 0)
+
+errorbar(ax(2), 1:length(stims), pbcallpct, pbsem,...
+    'Marker', 'o',...
+    'MarkerSize', 8,...
+    'MarkerFaceColor', cm(2,:),...
+    'Color', cm(2,:),...
+    'LineWidth', 1.5,...
+    'CapSize', 0)
+
+xlim([0 length(stims)+1])
+ylim([ax(2).YLim(1)-5 ax(2).YLim(2)+5])
+xticks(1:length(stims))
+xticklabels(stims)
+ylabel(ax(2),'% total calls',...
+    'FontWeight', 'bold')
+
+% axes etc
+for i = 1:2
+    set(ax(i), 'TickDir', 'out',...
+        'XTickLabelRotation', 0,...
+        'TickLength', [0.02,0.02],...
+        'LineWidth', 1.5);
+    set(findobj(ax(i),'-property','FontName'),...
+        'FontSize', 9,...
+        'FontName','Arial')
+    set(ax(i),'Layer', 'Top')
+end
+
+% legend
+legend('Block', 'PostBlock');
+legend('boxoff')
+
+sgtitle(birdname)
 
 % save
 fn = fullfile(d, append(birdname, '_total_calls.pdf'));
@@ -240,3 +310,58 @@ exportgraphics(f, fn,...
 fprintf(' done\n')
 
 clear f
+
+% plot consistency of calls?
+f = figure;
+f.Position = [0, 0, 800, 350];
+tiledlayout(2, 2,...
+    'Padding', 'compact',...
+    'TileSpacing', 'compact');
+
+stims = sort(stims);
+Q = nan(length(stims), 4);
+sem = nan(length(stims), 4);
+
+for i = 1:length(stims)
+    stimulusdata = D(contains(D.Stimulus, stims(i)),:);
+    block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
+    
+    cvars = contains(block.Properties.VariableNames, 'Q');
+    cinfo = block(:, cvars);
+    
+    for j = 1:4
+        Q(i,j) = mean(table2array(cinfo(:,j)), 'omitnan');
+        sem(i,j) = std(table2array(cinfo(:,j)), 'omitnan')/sqrt(height(cinfo));
+    end
+end
+
+for i = 1:4
+    ax(i) = nexttile;
+    hold on
+    bar(ax(i), Q(:,i)',...
+        'FaceColor', cm(1,:),...
+        'LineStyle', 'none')
+    errorbar(ax(i), Q(:,i)', sem(:,i)',...
+        'Marker', 'none',...
+        'Color', 'k',...
+        'LineStyle', 'none',...
+        'LineWidth', 1.5,...
+        'CapSize', 0)
+    
+    xticks(1:length(stims))
+    xticklabels(stims)
+    ylabel(ax(i),'% total calls to song',...
+        'FontWeight', 'bold')
+    
+    set(ax(i), 'TickDir', 'out',...
+        'XTickLabelRotation', 0,...
+        'TickLength', [0.02,0.02],...
+        'LineWidth', 1.5);
+    set(findobj(ax(i),'-property','FontName'),...
+        'FontSize', 9,...
+        'FontName','Arial')
+    set(ax(i),'Layer', 'Top')
+    title(ax(i), append('Q ', num2str(i)));
+end
+
+sgtitle(birdname)
