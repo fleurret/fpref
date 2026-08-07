@@ -1,10 +1,10 @@
-function CompareAllJamming(savedir, birdname, SnippetSubsampleDur, sqf)
+function CompareAllJamming(savedir, birdname, subf, SnippetSubsampleDur, sqf)
 
 %load Burdies;
 %E:\Data\DyadTest\female_male\dyad4-gr2bu30pk99rd81_Box1
 % \2024\_06\_30\20240630091431.wav
 
-d = uigetfile_n_dir(fullfile(savedir, birdname, 'testing'));
+d = uigetfile_n_dir(fullfile(savedir, birdname, subf));
 
 for f = 1:length(d)
     cd(cell2mat(d(f)))

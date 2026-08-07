@@ -1,6 +1,6 @@
 %% SET VARIABLES
 
-birdname = 'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
+birdname = 'or87yw46'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
 sex = 'female';
 
 filedir = fullfile('\\macaw.ucsf.edu\users\public\mikey_public\female_preference', birdname, 'exp_data');
@@ -39,10 +39,11 @@ savedir = 'D:\Brainard\Analysis\Female preference\'; % base folder for save file
         %% Compare channels
         % select session folder(s)
         % CompareAllJamming(savedir, birdname, SnippetSubsampleDur, sqf)
+        % subf: subfolder name
         % SnippetSubSampleDur: in s
         % sqf: square and filter songs (0: no, 1: yes)
         
-        CompareAllJamming(savedir, birdname, 0.02, 1)
+        CompareAllJamming(savedir, birdname, 'tempo_test', 0.02, 1)
         
         %% Compare channels for specific files
         % select individual .wav files (whichever channel for each block)
@@ -51,7 +52,7 @@ savedir = 'D:\Brainard\Analysis\Female preference\'; % base folder for save file
         % sqf: square and filter songs
         %   0: no, 1: yes
         
-        CompareAllJamming_file(savedir, birdname, 0.02, 0)
+        CompareAllJamming_file(savedir, birdname, 0.02, 1)
         
         %% Check for missing/mislabeled calls
         

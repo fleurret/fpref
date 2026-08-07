@@ -488,13 +488,6 @@ for i = 1:length(fn)
     
     %         if ((length(onsets2)+length(onsets1)>2)) % Are there at least 2 calls? Otherwise, nothing to analyse.
     
-    if ~isfolder("./cmpJamm/Ch1")
-        mkdir(fullfile('./cmpJamm/', 'Ch1'))
-    end
-    
-    if ~isfolder("./cmpJamm/Ch2")
-        mkdir(fullfile('./cmpJamm/', 'Ch2'))
-    end
     
     fil1 = cell2mat(fil1);
     fil2 = cell2mat(fil2);

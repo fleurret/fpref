@@ -94,7 +94,7 @@ switch sv
                         block = erase(bn{1}, 'Ch1');
                     end
                     
-                    idx = contains(timestamps.stimulus_filepath, block);
+                    idx = strcmp(timestamps.stimulus_filepath, block);
                     brow = find(idx == 1);
                     block_onset = timestamps.timestamp_HH_MM_SS_mmm_(brow+1) - timestamps.timestamp_HH_MM_SS_mmm_(brow);
                     block_offset = timestamps.timestamp_HH_MM_SS_mmm_(brow+2);
@@ -365,3 +365,10 @@ for i = 1:4
 end
 
 sgtitle(birdname)
+
+% save
+fn = fullfile(d, append(birdname, '_call_consistency.pdf'));
+fprintf('Saving %s ...', fn)
+exportgraphics(f, fn,...
+    'ContentType', 'vector')
+fprintf(' done\n')
