@@ -1,6 +1,6 @@
-function SplitandSeg(filedir, savedir, birdname)
+function SplitandSeg(filedir, savedir, birdname, subf)
 
-d = uigetfile_n_dir(filedir);
+d = uigetfile_n_dir(fullfile(filedir, subf));
 
 for f = 1:length(d)
     fnames = dir(cell2mat(fullfile(d(f), '*.wav')));
@@ -14,11 +14,11 @@ for f = 1:length(d)
     end
 
     try
-        cd(fullfile(savedir, birdname, 'testing', session))
+        cd(fullfile(savedir, birdname, subf, session))
     catch ME
         if strcmp(ME.identifier,'MATLAB:cd:NonExistentFolder')
-           mkdir(fullfile(savedir, birdname, 'testing', session))
-           cd(fullfile(savedir, birdname, 'testing', session))
+           mkdir(fullfile(savedir, birdname, subf, session))
+           cd(fullfile(savedir, birdname, subf, session))
         end
     end
     
@@ -46,8 +46,8 @@ for f = 1:length(d)
     end
     
     % copy over the OnsetLog also
-    ts = dir(fullfile(filedir, session, '*.txt'));
+    ts = dir(fullfile(filedir, subf, session, '*.txt'));
     ts = ts(contains([ts.name], 'OnsetLog'));
     
-    copyfile(fullfile(ts.folder, ts.name), fullfile(savedir, birdname, 'testing', session, ts.name))
+    copyfile(fullfile(ts.folder, ts.name), fullfile(savedir, birdname, subf, session, ts.name))
 end
