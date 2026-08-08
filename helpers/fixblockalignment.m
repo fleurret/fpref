@@ -1,7 +1,10 @@
-filedir = 'D:\Brainard\Analysis\Female preference\or87yw46\tempo_test\session_1\cmpJamm\Ch1';
-onsetlog = 'D:\Brainard\Analysis\Female preference\or87yw46\tempo_test\session_1\or87yw46_OnsetLog20260807100207.txt';
+filedir = 'Y:\public\mikey_public\female_preference\or87yw46\tempo_test\session_1';
+onsetlog = 'Y:\public\mikey_public\female_preference\or87yw46\tempo_test\session_1\or87yw46_OnsetLog20260807100207.txt';
+params = 'Y:\public\mikey_public\female_preference\or87yw46\tempo_test\session_1\or87yw46_Params20260807100207.txt';
+stimfolder = 'Y:\public\mikey_public\female_preference\or87yw46\tempo_test\stimuli';
 
 o = readtable(onsetlog);
+p = readtable(params, 'ReadVariableNames',false);
 [mats, wavs] = filelist(filedir);
 
 pbwavs = wavs(contains({wavs.name}, 'Post'));
@@ -18,10 +21,15 @@ for i = 1:length(bwavs)
     % concat
     wf3 = [wf1; wf2];
     
+    % match params
+    P = p(i,:);
+
+    [stimwav, sfs] = audioread(cell2mat(fullfile(stimfolder, P.Var10, P.Var11)));
+    stimdur = duration(seconds(length(stimwav)/sfs), 'format', 'hh:mm:ss.SSS');
+
     parts = split(pbwavs(i).name, '-');
-    stim = parts{2};
     block = parts{3};
-    
+
     % find timestamps
     if strcmp(block, 'Block0')
         blockstart = duration(seconds(0), 'format', 'hh:mm:ss.SSS');
@@ -34,10 +42,12 @@ for i = 1:length(bwavs)
         onset = o.Var2(brow+1);
         offset = o.Var2(brow+2);
     end
-    
-    blockdur = seconds(offset-blockstart);
-    B = wf3(1:blockdur*fs1);
-    PB = wf3(blockdur*fs1 + 1:end);
+
+    jitter = seconds(onset-blockstart)*2;
+    blockdur = seconds(stimdur) + jitter;
+
+    B = wf3(1:blockdur*fs1, 1:3);
+    PB = wf3(blockdur*fs1 + 1:end, 1:3);
     
     % save
     if ~isfolder(fullfile(filedir, 'fixed'))
@@ -45,15 +55,15 @@ for i = 1:length(bwavs)
     end
     
     fn = fullfile(filedir, 'fixed');
-    audiowrite(ffn(fn, bwavs(i).name), B, fs1);
-    audiowrite(ffn(fn, pbwavs(i).name), PB, fs2);
+    audiowrite(fullfile(fn, bwavs(i).name), B, fs1);
+    audiowrite(fullfile(fn, pbwavs(i).name), PB, fs2);
 end
 
 function [mats, wavs] = filelist(filedir)
 
 d = dir(filedir);
-d = d(~ismember({d.name},{'.','..'}));
+d = d(~ismember({d.name},{'.','..','fixed'}));
 mats = d(contains({d.name}, '.not.mat'));
-wavs = d(~contains({d.name}, '.not.mat'));
+wavs = d(~contains({d.name}, '.not.mat') & contains({d.name}, '.wav'));
 
 end
