@@ -4,7 +4,7 @@ birdname = 'or87yw46'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
 sex = 'female';
 
 filedir = fullfile('\\macaw.ucsf.edu\users\public\mikey_public\female_preference', birdname, 'exp_data');
-savedir = 'D:\Brainard\Analysis\Female preference\'; % base folder for save files
+savedir = 'X:\Brainard\Analysis\Female preference\'; % base folder for save files
 
 %% SCREENING
 
