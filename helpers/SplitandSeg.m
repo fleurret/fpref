@@ -47,7 +47,9 @@ for f = 1:length(d)
     
     % copy over the OnsetLog also
     ts = dir(fullfile(filedir, subf, session, '*.txt'));
-    ts = ts(contains([ts.name], 'OnsetLog'));
+    o = ts(contains({ts.name}, 'OnsetLog'));
+    p = ts(contains({ts.name}, 'Params'));
     
-    copyfile(fullfile(ts.folder, ts.name), fullfile(savedir, birdname, subf, session, ts.name))
+    copyfile(fullfile(o.folder, o.name), fullfile(savedir, birdname, subf, session, o.name))
+    copyfile(fullfile(p.folder, p.name), fullfile(savedir, birdname, subf, session, p.name))
 end

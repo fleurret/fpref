@@ -1,4 +1,4 @@
-function CompareAllJamming_file(savedir, birdname, SnippetSubsampleDur, sqf)
+function CompareAllJamming_file(savedir, birdname, subf, SnippetSubsampleDur, sqf)
 
 % sometimes you just want to run one session
 
@@ -12,7 +12,7 @@ function CompareAllJamming_file(savedir, birdname, SnippetSubsampleDur, sqf)
 %E:\Data\DyadTest\female_male\dyad4-gr2bu30pk99rd81_Box1
 % \2024\_06\_30\20240630091431.wav
 
-cd(fullfile(savedir, birdname, 'testing'))
+cd(fullfile(savedir, birdname, subf))
 
 [fn, d] = uigetfile({'*.wav'}, 'Select file(s)',...
     'MultiSelect', 'on');
