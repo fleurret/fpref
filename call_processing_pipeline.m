@@ -4,7 +4,7 @@ birdname = 'or87yw46'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
 sex = 'female';
 
 filedir = fullfile('\\macaw.ucsf.edu\users\public\mikey_public\female_preference', birdname, 'exp_data');
-savedir = 'X:\Brainard\Analysis\Female preference\'; % base folder for save files
+savedir = 'E:\rose\analysis\female preference\'; % base folder for save files
 
 %% SCREENING
 
@@ -52,7 +52,10 @@ savedir = 'X:\Brainard\Analysis\Female preference\'; % base folder for save file
         % sqf: square and filter songs
         %   0: no, 1: yes
         
-        CompareAllJamming_file(savedir, birdname, 0.02, 1)
+        CompareAllJamming_file(savedir, birdname, 'tempo_test', 0.02, 0)
+
+        %% Organize files for export
+        exportfiles(savedir, birdname, 'tempo_test')
         
         %% Check for missing/mislabeled calls
         
