@@ -1,4 +1,4 @@
-function countcalls_tempo(savedir, birdname, sv)
+function countcalls(savedir, birdname, sv)
 
 % savedir: base folder for save files
 % (e.g. D:\Analysis)
@@ -11,10 +11,7 @@ function countcalls_tempo(savedir, birdname, sv)
 % D:\Analysis\or87yw46\session_2, etc. and
 % D:\Analysis\or87yw46\or87yw46_OnsetLog.txt)
 
-stims = {'ZF', 'MP', 'LP'};
-cm = [242,211,137;... % ZF
-    35,185,184; ... % MP
-    54,97,97]./255; % LP
+cm = [69,129,92; 166,195,177]./255;
 d = cell2mat(uigetfile_n_dir(fullfile(savedir, birdname)));
 
 switch sv
@@ -31,8 +28,8 @@ switch sv
         sessions = sessions([sessions.isdir]);
         
         % table headers
-        headers = {'Subject', 'Session', 'Stimulus', 'StimNum', 'GapChange', 'Block', 'BlockType',...
-            'NumCalls', 'TimeS', 'Q1Pct', 'Q2Pct', 'Q3Pct', 'Q4Pct'};
+        headers = {'Subject', 'Session', 'Stimulus', 'Block',...
+            'BlockType', 'NumCalls', 'Q1Pct', 'Q2Pct', 'Q3Pct', 'Q4Pct'};
         D = [];
         
         % sessions
@@ -40,13 +37,14 @@ switch sv
             
             session = erase(sessions(i).name, 'session_');
             
-            % load timestamps and params
-            ts = dir(fullfile(d, sessions(i).name, '*.txt'));
-%             o = ts(contains({ts.name}, 'OnsetLog'));
-            p = ts(contains({ts.name}, 'Params'));
-            
-%             timestamps = readtable(fullfile(o.folder, o.name), 'ReadVariableNames',false);
-            params = readtable(fullfile(p.folder, p.name), 'ReadVariableNames',false);
+            % load timestamps
+%             ts = dir(fullfile(d, sessions(i).name, '*.txt'));
+%             
+%             if isempty(ts)
+%                 error('Timestamps file is missing :(')
+%             end
+%             
+%             timestamps = readtable(fullfile(ts.folder, ts.name));
             
             if isfolder(fullfile(sessions(i).folder, sessions(i).name, 'cmpJamm'))
                 sd = fullfile(sessions(i).folder, sessions(i).name, 'cmpJamm', 'Ch1');
@@ -54,50 +52,28 @@ switch sv
                 sd = fullfile(sessions(i).folder, sessions(i).name);
             end
             
+%             callfiles = dir(sd);
+%             callfiles = callfiles(~ismember({callfiles.name}, {'.','..'}));
+%             callfiles = callfiles(~endsWith({callfiles.name}, '.wav'));
+%             callfiles = callfiles(~contains({callfiles.name}, 'OnsetLog'));
+
             allfiles = dir(sd);
             allfiles = allfiles(~ismember({allfiles.name}, {'.','..'}));
             callfiles = allfiles(endsWith({allfiles.name}, '.not.mat'));
             wavfiles = allfiles(endsWith({allfiles.name}, '.wav'));
             
             % create tables
-            blockdata = table('size',[length(callfiles) 13],...
-                'variabletypes',["string","string", "string","string","string","string","string",...
-                "double","double","double","double","double","double"],...
+            blockdata = table('size',[length(callfiles) 10],...
+                'variabletypes',["string","string","string","string","string","double","double","double","double","double"],...
                 'variablenames', headers);
             
             % load file
             for j = 1:length(callfiles)
                 
-                % which stim/match to params
+                % which block/stim
                 fn = split(callfiles(j).name, '-');
-                stimulus = fn{2};
-                sn = erase(stimulus, 'Stim');
-                
-                pinfo = params(contains(params.Var1, 'C:') & contains(params.Var1, sn), :);
-                
-                if height(pinfo) > 1
-                    var1 = pinfo.Var1;
-                    n = {};
-                    for k = 1:length(var1)
-                       n(k) = extract(var1(k), digitsPattern);
-                    end
-                    
-                    idx = strcmp(n, sn);
-                    pinfo = pinfo(idx,:);
-                end
-                
-                type = pinfo.Var10;
-                ver = pinfo.Var11;
-                
-                parts = split(ver, '_');
-                if contains(ver, 'increase')
-                    V = parts{2};
-                elseif contains(ver, 'decrease')
-                    V = append('-', parts{2});
-                else
-                    V = {0};
-                end
-
+                stimulus = fn{2};                
+                          
                 % load wav
                 bn = split(fn(end), '.');
                 if contains(bn{1}, 'Ch1')
@@ -114,7 +90,12 @@ switch sv
                     end
                 end
                 
-                wfn = append(fp, bn(1), '.wav');
+                if isfolder(fullfile(sessions(i).folder, sessions(i).name, 'cmpJamm'))
+                    wfn = append(fp, bn(1), '.wav');
+                else
+                    wfn = append(fp, bn(1), 'Ch1.wav');
+                end
+                
                 wav = wavfiles(contains({wavfiles.name}, wfn));
                 [wf, fs] = audioread(fullfile(wav.folder, wav.name));
                 
@@ -124,43 +105,41 @@ switch sv
                 % is it a block or post block
                 if contains(data.fname, 'Post')
                     block = fn{3};
-                    t = length(wf)/fs;
                     
                     blockdata(j,:).Subject = birdname;
                     blockdata(j,:).Session = session;
-                    blockdata(j,:).Stimulus = type;
-                    blockdata(j,:).StimNum = stimulus;
-                    blockdata(j,:).GapChange = V;
+                    blockdata(j,:).Stimulus = stimulus;
                     blockdata(j,:).Block = block;
                     blockdata(j,:).BlockType = 'PostBlock';
                     blockdata(j,:).NumCalls = length(data.onsets);
-                    blockdata(j,:).TimeS = t;
                     blockdata(j,:).Q1Pct = NaN;
                     blockdata(j,:).Q2Pct = NaN;
                     blockdata(j,:).Q3Pct = NaN;
                     blockdata(j,:).Q4Pct = NaN;
-                
                 else
                     
                     % match timestamps
-
-%                     idx = strcmp(timestamps.Var4, block);
+%                     bn = split(fn{3},'.');
 %                     
-%                     if sum(idx) == 0
-%                         brow = 0;
-%                         block_onset = timestamps.Var2(brow+1);
-%                     else
-%                         brow = find(idx == 1);
-%                         block_onset = timestamps.Var2(brow+1) - timestamps.Var2(brow);
+%                     if contains(bn{1}, 'Ch1')
+%                         block = erase(bn{1}, 'Ch1');
 %                     end
 %                     
-%                     block_offset = block_onset + duration(seconds(t), 'format', 'hh:mm:ss.SSS');
-%                     
+%                     idx = strcmp(timestamps.stimulus_filepath, block);
+%                     brow = find(idx == 1);
+%                     block_onset = timestamps.timestamp_HH_MM_SS_mmm_(brow+1) - timestamps.timestamp_HH_MM_SS_mmm_(brow);
+%                     block_offset = timestamps.timestamp_HH_MM_SS_mmm_(brow+2);
+                    
                     % get timestamps from segmented wavs - more accurate
-                    ch2seg = round(wf(:,5));
-                    block_onset = duration(seconds(min(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
-                    block_offset = duration(seconds(max(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
-                    t = seconds(block_offset - block_onset);
+                    if isfolder(fullfile(sessions(i).folder, sessions(i).name, 'cmpJamm'))
+                        ch2seg = round(wf(:,5));
+                        block_onset = duration(seconds(min(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
+                        block_offset = duration(seconds(max(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
+                    else
+                        
+                    end
+                    
+
                     
                     % remove preblock calls
                     onsets = sort(data.onsets);
@@ -172,10 +151,7 @@ switch sv
                     
                     blockdata(j,:).Subject = birdname;
                     blockdata(j,:).Session = session;
-                    blockdata(j,:).Stimulus = type;
-                    blockdata(j,:).StimNum = stimulus;
-                    blockdata(j,:).GapChange = V;
-                    blockdata(j,:).TimeS = t;
+                    blockdata(j,:).Stimulus = stimulus;
                     blockdata(j,:).Block = block;
                     blockdata(j,:).BlockType = 'Block';
                     blockdata(j,:).NumCalls = length(calls);
@@ -209,22 +185,30 @@ if ismatrix(D.Session)
     D.Session = string(D.Session);
 end
 
-% only blocks
-D = D(strcmp(D.BlockType, 'Block'),:);
 sessions = sort(str2double(unique(D.Session)));
+stims = unique(D.Stimulus);
 
 % plot across sessions
 f = figure;
 f.Position = [0, 0, 800, 1800];
+
 tiledlayout(round(length(sessions)/2), 2,...
     'Padding', 'compact',...
     'TileSpacing', 'compact');
 
 for i = 1:length(sessions)
     sessiondata = D(str2double(D.Session) == sessions(i),:);
-    sessiondata = sortrows(sessiondata, ["Stimulus", "GapChange"], 'descend');
+    
+    X = 1:length(stims);
+    Y = nan(length(stims), 2);
+    
+    for j = 1:length(stims)
+        stimulusdata = sessiondata(contains(sessiondata.Stimulus, stims(j)),:);
+        Y(j,:) = flip(stimulusdata.NumCalls');
+    end
     
     ax(i) = nexttile;
+    
     set(ax(i), 'TickDir', 'out',...
         'XTickLabelRotation', 0,...
         'TickLength', [0.02,0.02],...
@@ -234,33 +218,22 @@ for i = 1:length(sessions)
         'FontName','Arial')
     hold on
     
-    start = 0;
-    
-    for j = 1:length(stims)
-
-        typedata = sessiondata(strcmp(sessiondata.Stimulus, stims(j)),:);
-%         typedata = sessiondata(j,:);
-    
-        X = start+1:start+height(typedata);
-        Y = typedata.NumCalls ./ typedata.TimeS;
-        
-        start = start + height(typedata);
-        
-        bar(ax(i), X, Y,...
-            'LineStyle', 'none',...
-            'FaceColor', cm(j,:));
-    end
-    
-    xticks(1:height(sessiondata))
-    xticklabels(sessiondata.GapChange)
-    xlabel(ax, 'Gap change (%)')
-    ylabel(ax,'Calls/sec',...
+    b = bar(ax(i), X, Y,...
+        'LineStyle', 'none');
+    set(b(1),...
+        'FaceColor', cm(1,:))
+    set(b(2),...
+        'FaceColor', cm(2,:))
+    xticks(1:length(stims))
+    xticklabels(stims)
+    ylabel(ax,'Calls',...
         'FontWeight', 'bold')
     title(['Session ', num2str(i)])
     set(ax(i) ,'Layer', 'Top')
 end
 
-legend(ax(i), stims)
+legend(ax(i),...
+    'Block', 'PostBlock')
 legend(ax(i), 'boxoff')
 linkaxes(ax, 'y')
 sgtitle(birdname)
@@ -274,124 +247,100 @@ fprintf(' done\n')
 
 clear f
 
-% plot average
+% plot total calls
 f = figure;
 f.Position = [0, 0, 500, 300];
-% tiledlayout(2, 1,...
-%     'Padding', 'compact',...
-%     'TileSpacing', 'compact');
-%  
-% ax(1) = nexttile;
-start = 0;
+tiledlayout(2, 1,...
+    'Padding', 'compact',...
+    'TileSpacing', 'compact');
+
+ax(1) = nexttile;
 
 % total for each stimulus
-% for i = 1:length(stims)
-%     hold on
-%     stimulusdata = D(contains(D.Stimulus, stims(i)),:);
-%     stimulusdata = sortrows(stimulusdata, "GapChange", 'descend');
-%     gaps = flip(unique(stimulusdata.GapChange));
-%     
-%     X = start+1:start+length(gaps);
-%     Y = nan(1, length(gaps));
-%     sem = nan(1, length(gaps));
-%     
-%     for j = 1:length(gaps)
-%        gapdata = stimulusdata(stimulusdata.GapChange == gaps(j),:); 
-%        Y(j) = mean(gapdata.NumCalls);
-%        sem(j) = std(gapdata.NumCalls)/sqrt(height(gapdata));
-%     end
-%     
-%     start = start+length(gaps);
-%     
-%     b = bar(ax(1), X, Y,...
-%         'LineStyle', 'none',...
-%         'FaceColor', cm(i,:));
-%     
-% %     postblock = stimulusdata(contains(stimulusdata.BlockType, 'Post'),:);
-% %     block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
-% %     
-% %     calls = [sum(block.NumCalls) sum(postblock.NumCalls)];
-% %     b = bar(ax(1), i, calls, 'stacked',...
-% %         'LineStyle', 'none');
-% %     set(b(1),...
-% %         'FaceColor', cm(1,:))
-% %     set(b(2),...
-% %         'FaceColor', cm(2,:))
-% 
-% end
-% 
-% xticks(1:length(sessiondata.GapChange))
-% xticklabels(sessiondata.GapChange)
-% ylabel(ax(1),'Total calls',...
-%     'FontWeight', 'bold')
-
-% as a percentage
-% ax(2) = nexttile;
-
-ax = gca;
-hold on
-
-start = 0;
-
 for i = 1:length(stims)
+    hold on
     stimulusdata = D(contains(D.Stimulus, stims(i)),:);
-    stimulusdata = sortrows(stimulusdata, "GapChange", 'descend');
     
-    Y = [];
-    sem = [];
+    postblock = stimulusdata(contains(stimulusdata.BlockType, 'Post'),:);
+    block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
     
-    if strcmp(stims(i), 'ZF')
-        variants = unique(stimulusdata.StimNum);
-        for j = 1:length(variants)
-            stimdata = stimulusdata(contains(stimulusdata.StimNum, variants(j)),:);
-            normcalls = stimdata.NumCalls ./ stimdata.TimeS;
-            Y(j) = mean(normcalls);
-            sem(j) = std(normcalls)/sqrt(length(normcalls));
-        end
-    else
-        variants = flip(unique(stimulusdata.GapChange));
-        for j = 1:length(variants)
-            stimdata = stimulusdata(stimulusdata.GapChange== variants(j),:);
-            normcalls = stimdata.NumCalls ./ stimdata.TimeS;
-            Y(j) = mean(normcalls);
-            sem(j) = std(normcalls)/sqrt(length(normcalls));
-        end
-    end
-    
-    X = [start+1:start+length(variants)];
-    start = start+length(variants);   
-
-    b(i) = bar(ax, X, Y,...
-        'LineStyle', 'none',...
-        'FaceColor', cm(i,:));
-    errorbar(ax, X, Y, sem,...
-        'Marker', 'none',...
-        'Color', 'k',...
-        'LineStyle', 'none',...
-        'LineWidth', 1.5,...
-        'CapSize', 0)
+    calls = [sum(block.NumCalls) sum(postblock.NumCalls)];
+    b = bar(ax(1), i, calls, 'stacked',...
+        'LineStyle', 'none');
+    set(b(1),...
+        'FaceColor', cm(1,:))
+    set(b(2),...
+        'FaceColor', cm(2,:))
 end
 
-xticks(1:length(sessiondata.GapChange))
-xticklabels(sessiondata.GapChange)
-xlabel(ax, 'Gap change (%)')
-ylabel(ax,'Mean calls/sec',...
+xticks(1:length(stims))
+xticklabels(stims)
+ylabel(ax(1),'Total calls',...
+    'FontWeight', 'bold')
+
+% as a percentage
+ax(2) = nexttile;
+hold on
+
+C = [];
+
+for i = 1:length(sessions)
+    sessiondata = D(str2double(D.Session) == sessions(i),:);
+    allsessioncalls = sum(sessiondata.NumCalls);
+    
+    sessiondata.PctCalls = (sessiondata.NumCalls/allsessioncalls)*100;
+    C = [C; sessiondata];
+end
+
+for i = 1:length(stims)
+    stimulusdata = C(contains(C.Stimulus, stims(i)),:);
+    
+    postblock = stimulusdata(contains(stimulusdata.BlockType, 'Post'),:);
+    block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
+    
+    bcallpct(i) = sum(block.NumCalls)/height(block);
+    bsem(i) = std(block.NumCalls)/sqrt(height(block));
+    pbcallpct(i) = sum(postblock.NumCalls)/height(postblock);
+    pbsem(i) = std(postblock.NumCalls)/sqrt(height(postblock));
+end
+
+errorbar(ax(2), 1:length(stims), bcallpct, bsem,...
+    'Marker', 'o',...
+    'MarkerSize', 8,...
+    'MarkerFaceColor', cm(1,:),...
+    'Color', cm(1,:),...
+    'LineWidth', 1.5,...
+    'CapSize', 0)
+
+errorbar(ax(2), 1:length(stims), pbcallpct, pbsem,...
+    'Marker', 'o',...
+    'MarkerSize', 8,...
+    'MarkerFaceColor', cm(2,:),...
+    'Color', cm(2,:),...
+    'LineWidth', 1.5,...
+    'CapSize', 0)
+
+xlim([0 length(stims)+1])
+ylim([ax(2).YLim(1)-5 ax(2).YLim(2)+5])
+xticks(1:length(stims))
+xticklabels(stims)
+ylabel(ax(2),'% total calls',...
     'FontWeight', 'bold')
 
 % axes etc
 for i = 1:2
-    set(ax, 'TickDir', 'out',...
+    set(ax(i), 'TickDir', 'out',...
         'XTickLabelRotation', 0,...
         'TickLength', [0.02,0.02],...
         'LineWidth', 1.5);
-    set(findobj(ax,'-property','FontName'),...
+    set(findobj(ax(i),'-property','FontName'),...
         'FontSize', 9,...
         'FontName','Arial')
-    set(ax,'Layer', 'Top')
+    set(ax(i),'Layer', 'Top')
 end
 
 % legend
-legend(b, stims);
+legend('Block', 'PostBlock');
 legend('boxoff')
 
 sgtitle(birdname)
@@ -405,7 +354,7 @@ fprintf(' done\n')
 
 clear f
 
-% % plot consistency of calls?
+% plot consistency of calls?
 f = figure;
 f.Position = [0, 0, 800, 350];
 tiledlayout(2, 2,...
@@ -459,10 +408,10 @@ for i = 1:4
 end
 
 sgtitle(birdname)
-% 
-% % save
-% fn = fullfile(d, append(birdname, '_call_consistency.pdf'));
-% fprintf('Saving %s ...', fn)
-% exportgraphics(f, fn,...
-%     'ContentType', 'vector')
-% fprintf(' done\n')
+
+% save
+fn = fullfile(d, append(birdname, '_call_consistency.pdf'));
+fprintf('Saving %s ...', fn)
+exportgraphics(f, fn,...
+    'ContentType', 'vector')
+fprintf(' done\n')

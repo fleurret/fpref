@@ -58,6 +58,6 @@ savedir = 'E:\rose\analysis\female preference\'; % base folder for save files
         exportfiles(savedir, birdname, 'tempo_test')
         
         %% Check for missing/mislabeled calls
-        
+         
         evsonganaly
                     

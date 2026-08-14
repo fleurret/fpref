@@ -37,25 +37,25 @@ switch sv
             
             session = erase(sessions(i).name, 'session_');
             
-            % load timestamps
-            ts = dir(fullfile(d, sessions(i).name, '*.txt'));
-            
-            if isempty(ts)
-                error('Timestamps file is missing :(')
-            end
-            
-            timestamps = readtable(fullfile(ts.folder, ts.name));
-            
             if isfolder(fullfile(sessions(i).folder, sessions(i).name, 'cmpJamm'))
                 sd = fullfile(sessions(i).folder, sessions(i).name, 'cmpJamm', 'Ch1');
             else
                 sd = fullfile(sessions(i).folder, sessions(i).name);
+                
+                % load timestamps
+                ts = dir(fullfile(d, sessions(i).name, '*.txt'));
+                
+                if isempty(ts)
+                    error('Timestamps file is missing :(')
+                end
+                
+                timestamps = readtable(fullfile(ts.folder, ts.name));
             end
-            
-            callfiles = dir(sd);
-            callfiles = callfiles(~ismember({callfiles.name}, {'.','..'}));
-            callfiles = callfiles(~endsWith({callfiles.name}, '.wav'));
-            callfiles = callfiles(~contains({callfiles.name}, 'OnsetLog'));
+
+            allfiles = dir(sd);
+            allfiles = allfiles(~ismember({allfiles.name}, {'.','..'}));
+            callfiles = allfiles(endsWith({allfiles.name}, '.not.mat'));
+            wavfiles = allfiles(endsWith({allfiles.name}, '.wav'));
             
             % create tables
             blockdata = table('size',[length(callfiles) 10],...
@@ -69,6 +69,32 @@ switch sv
                 fn = split(callfiles(j).name, '-');
                 stimulus = fn{2};
                 
+                % load wav
+                bn = split(fn(end), '.');
+                if contains(bn{1}, 'Ch1')
+                    block = erase(bn{1}, 'Ch1');
+                end
+                
+                rbn = fn(1:end-1);
+                fp = '';
+                for k = 1:length(rbn)
+                    if k ==- length(rbn)
+                        fp = append(fp, rbn(k));
+                    else
+                        fp = append(fp, rbn(k), '-');
+                    end
+                end
+                
+                if isfolder(fullfile(sessions(i).folder, sessions(i).name, 'cmpJamm'))
+                    wfn = append(fp, bn(1), '.wav');
+                else
+                    wfn = append(fp, bn(1), 'Ch1.wav');
+                end
+                
+                wav = wavfiles(contains({wavfiles.name}, wfn));
+                [wf, fs] = audioread(fullfile(wav.folder, wav.name));
+                
+                % load mat data
                 data = load(fullfile(callfiles(j).folder, callfiles(j).name));
                 
                 % is it a block or post block
@@ -87,17 +113,21 @@ switch sv
                     blockdata(j,:).Q4Pct = NaN;
                 else
                     
-                    % match timestamps
-                    bn = split(fn{3},'.');
-                    
-                    if contains(bn{1}, 'Ch1')
-                        block = erase(bn{1}, 'Ch1');
+                    % get timestamps from segmented wavs; more accurate
+                    if isfolder(fullfile(sessions(i).folder, sessions(i).name, 'cmpJamm'))
+                        ch2seg = round(wf(:,5));
+                        block_onset = duration(seconds(min(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
+                        block_offset = duration(seconds(max(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
+                    else % deal with or87yw46
+                        if contains(bn{1}, 'Ch1')
+                            block = erase(bn{1}, 'Ch1');
+                        end
+                        
+                        idx = strcmp(timestamps.stimulus_filepath, block);
+                        brow = find(idx == 1);
+                        block_onset = timestamps.timestamp_HH_MM_SS_mmm_(brow+1) - timestamps.timestamp_HH_MM_SS_mmm_(brow) + timestamps.timestamp_HH_MM_SS_mmm_(1);
+                        block_offset = timestamps.timestamp_HH_MM_SS_mmm_(brow+2) - timestamps.timestamp_HH_MM_SS_mmm_(brow) + timestamps.timestamp_HH_MM_SS_mmm_(1);
                     end
-                    
-                    idx = strcmp(timestamps.stimulus_filepath, block);
-                    brow = find(idx == 1);
-                    block_onset = timestamps.timestamp_HH_MM_SS_mmm_(brow+1) - timestamps.timestamp_HH_MM_SS_mmm_(brow);
-                    block_offset = timestamps.timestamp_HH_MM_SS_mmm_(brow+2);
                     
                     % remove preblock calls
                     onsets = sort(data.onsets);
@@ -149,7 +179,8 @@ stims = unique(D.Stimulus);
 % plot across sessions
 f = figure;
 f.Position = [0, 0, 800, 1800];
-tiledlayout(length(sessions)/2, 2,...
+
+tiledlayout(round(length(sessions)/2), 2,...
     'Padding', 'compact',...
     'TileSpacing', 'compact');
 
