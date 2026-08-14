@@ -26,14 +26,32 @@ switch sv
         end
         
     case 'save'
-        sessions = dir(d);
-        sessions = sessions(~ismember({sessions.name},{'.','..'}));
-        sessions = sessions([sessions.isdir]);
+        if isfile(fullfile(d, append(birdname, '_calls.csv')))
+            D = readtable(fullfile(d, append(birdname, '_calls.csv')));
+            sessions = dir(d);
+            sessions = sessions(~ismember({sessions.name},{'.','..'}));
+            sessions = sessions([sessions.isdir]);
+            
+            es = unique(D.Session);
+            
+            for i = 1:length(es)
+               done = append('session_', num2str(es(i))); 
+               sessions = sessions(~contains({sessions.name}, done));
+            end
+            
+            if isempty(sessions)
+                error('No new data to add :)')
+            end
+        else
+            D = [];
+            sessions = dir(d);
+            sessions = sessions(~ismember({sessions.name},{'.','..'}));
+            sessions = sessions([sessions.isdir]);
+        end
         
         % table headers
         headers = {'Subject', 'Session', 'Stimulus', 'StimNum', 'GapChange', 'Block', 'BlockType',...
             'NumCalls', 'TimeS', 'Q1Pct', 'Q2Pct', 'Q3Pct', 'Q4Pct'};
-        D = [];
         
         % sessions
         for i = 1:length(sessions)
