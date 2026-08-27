@@ -1,10 +1,11 @@
 %% SET VARIABLES
 
-birdname = 'or87yw46'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
+birdname = 'or25rd67'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'; 'wh26wh27'
 sex = 'female';
 
 filedir = fullfile('\\macaw.ucsf.edu\users\public\mikey_public\female_preference', birdname, 'exp_data');
-savedir = 'E:\rose\analysis\female preference\'; % base folder for save files
+savedir = 'D:\Brainard\Analysis\Female preference'; % base folder for save files
+subf = 'pref_retest';
 
 %% SCREENING
 
@@ -43,7 +44,7 @@ savedir = 'E:\rose\analysis\female preference\'; % base folder for save files
         % SnippetSubSampleDur: in s
         % sqf: square and filter songs (0: no, 1: yes)
         
-        CompareAllJamming(savedir, birdname, 'tempo_test', 0.02, 1)
+        CompareAllJamming(savedir, birdname, subf, 0.02, 1)
         
         %% Compare channels for specific files
         % select individual .wav files (whichever channel for each block)
@@ -52,7 +53,7 @@ savedir = 'E:\rose\analysis\female preference\'; % base folder for save files
         % sqf: square and filter songs
         %   0: no, 1: yes
         
-        CompareAllJamming_file(savedir, birdname, 'tempo_test', 0.02, 0)
+        CompareAllJamming_file(savedir, birdname, 'tempo_test', 0.02, 1)
 
         %% Organize files for export
         exportfiles(savedir, birdname, 'tempo_test')

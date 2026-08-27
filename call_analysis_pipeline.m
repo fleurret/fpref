@@ -2,9 +2,9 @@
 
 birdname = 'wh26wh27';
     %'wh26wh27'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
-savedir = 'X:\Brainard\Analysis\Female preference';
+savedir = 'D:\Brainard\Analysis\Female preference';
 
-%% ANALYSIS
+%% ANALYSIS -- STIMULUS PREFERENCE
         
         %% Count number of calls for each stimulus
         % saves a CSV file with number of calls for each block/postblock in
@@ -17,13 +17,39 @@ savedir = 'X:\Brainard\Analysis\Female preference';
         % sv: 'save' a CSV file for new subject
         %     'load' previously saved CSV file if you just want plots
 
-%         countcalls(savedir, birdname, 'save')
+        countcalls(savedir, birdname, 'save')
         
-        % modification for tempo preference test
+        %% Selectivity index
+        % calculates and plots selectivity index for each session/average
+        % across sessions
+        
+        prefsi(savedir, birdname)
+
+%% ANALYSIS -- TEMPO PREFERENCE
+
+        %% Plot session call raster
+        % plots raster for block calls by session
+        % callraster(savedir, birdname)
+        
+        callraster(savedir, birdname)
+        
+        %% Count normalized calls per stimulus
+        % saves a CSV file with number of calls for each block/postblock in
+        % each session
+        % plots block/postblock calls by session;
+        %       total block + postblock calls across sessions
+        %       call persistence across sessions
+        
+        % countcalls_tempo(savedir, birdname, sv)
+        % sv: 'save' a CSV file for new subject
+        %     'load' previously saved CSV file if you just want plots
+        
         countcalls_tempo(savedir, birdname, 'load')
         
-        %% Count lobes
-        % TBD
-        countlobes(savedir, birdname)
+        %% Selectivity index
+        % calculates and plots selectivity index for each session/average
+        % across sessions
+        
+        prefsi_tempo(savedir, birdname)
 
         

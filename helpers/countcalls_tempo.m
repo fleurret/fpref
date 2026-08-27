@@ -295,56 +295,8 @@ clear f
 % plot average
 f = figure;
 f.Position = [0, 0, 500, 300];
-% tiledlayout(2, 1,...
-%     'Padding', 'compact',...
-%     'TileSpacing', 'compact');
-%  
-% ax(1) = nexttile;
+
 start = 0;
-
-% total for each stimulus
-% for i = 1:length(stims)
-%     hold on
-%     stimulusdata = D(contains(D.Stimulus, stims(i)),:);
-%     stimulusdata = sortrows(stimulusdata, "GapChange", 'descend');
-%     gaps = flip(unique(stimulusdata.GapChange));
-%     
-%     X = start+1:start+length(gaps);
-%     Y = nan(1, length(gaps));
-%     sem = nan(1, length(gaps));
-%     
-%     for j = 1:length(gaps)
-%        gapdata = stimulusdata(stimulusdata.GapChange == gaps(j),:); 
-%        Y(j) = mean(gapdata.NumCalls);
-%        sem(j) = std(gapdata.NumCalls)/sqrt(height(gapdata));
-%     end
-%     
-%     start = start+length(gaps);
-%     
-%     b = bar(ax(1), X, Y,...
-%         'LineStyle', 'none',...
-%         'FaceColor', cm(i,:));
-%     
-% %     postblock = stimulusdata(contains(stimulusdata.BlockType, 'Post'),:);
-% %     block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
-% %     
-% %     calls = [sum(block.NumCalls) sum(postblock.NumCalls)];
-% %     b = bar(ax(1), i, calls, 'stacked',...
-% %         'LineStyle', 'none');
-% %     set(b(1),...
-% %         'FaceColor', cm(1,:))
-% %     set(b(2),...
-% %         'FaceColor', cm(2,:))
-% 
-% end
-% 
-% xticks(1:length(sessiondata.GapChange))
-% xticklabels(sessiondata.GapChange)
-% ylabel(ax(1),'Total calls',...
-%     'FontWeight', 'bold')
-
-% as a percentage
-% ax(2) = nexttile;
 
 ax = gca;
 hold on
@@ -423,45 +375,48 @@ fprintf(' done\n')
 
 clear f
 
-% % plot consistency of calls?
+% % plot consistency of calls
 f = figure;
 f.Position = [0, 0, 800, 350];
 tiledlayout(2, 2,...
     'Padding', 'compact',...
     'TileSpacing', 'compact');
 
-stims = sort(stims);
-Q = nan(length(stims), 4);
-sem = nan(length(stims), 4);
-
-for i = 1:length(stims)
-    stimulusdata = D(contains(D.Stimulus, stims(i)),:);
-    block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
-    
-    cvars = contains(block.Properties.VariableNames, 'Q');
-    cinfo = block(:, cvars);
-    
-    for j = 1:4
-        Q(i,j) = mean(table2array(cinfo(:,j)), 'omitnan');
-        sem(i,j) = std(table2array(cinfo(:,j)), 'omitnan')/sqrt(height(cinfo));
-    end
-end
+D = sortrows(D, ["Stimulus", "GapChange"], 'descend');
+stimuli = unique(D.StimNum, 'stable');
 
 for i = 1:4
+    Q = nan(1, length(stimuli));
+    sem = nan(1, length(stimuli));
+    
     ax(i) = nexttile;
     hold on
-    bar(ax(i), Q(:,i)',...
-        'FaceColor', cm(1,:),...
-        'LineStyle', 'none')
-    errorbar(ax(i), Q(:,i)', sem(:,i)',...
-        'Marker', 'none',...
-        'Color', 'k',...
-        'LineStyle', 'none',...
-        'LineWidth', 1.5,...
-        'CapSize', 0)
     
-    xticks(1:length(stims))
-    xticklabels(stims)
+    for j = 1:length(stimuli)
+        stimulusdata = D(strcmp(D.StimNum, stimuli(j)),:);
+        
+        Qi = stimulusdata(:, contains(stimulusdata.Properties.VariableNames, 'Q'));
+        X = j;
+        Y = mean(table2array(Qi(:,i)), 'omitnan');
+        sem = std(table2array(Qi(:,i)), 'omitnan')/sqrt(height(Qi));
+        
+        color = cm(strcmp(stims, unique(stimulusdata.Stimulus)), :);
+        
+        bar(ax(i), X, Y,...
+            'FaceColor', color,...
+            'LineStyle', 'none')
+        errorbar(X, Y, sem,...
+            'Marker', 'none',...
+            'Color', 'k',...
+            'LineStyle', 'none',...
+            'LineWidth', 1.5,...
+            'CapSize', 0)
+    end
+    
+    xticks(1:length(stimuli))
+    xticklabels(sessiondata.GapChange)
+    xlabel(ax(i), 'Gap change (%)',...
+        'FontWeight', 'bold')
     ylabel(ax(i),'% total calls to song',...
         'FontWeight', 'bold')
     
@@ -473,14 +428,14 @@ for i = 1:4
         'FontSize', 9,...
         'FontName','Arial')
     set(ax(i),'Layer', 'Top')
-    title(ax(i), append('Q ', num2str(i)));
+    title(ax(i), append('Q ', num2str(i)));  
 end
 
 sgtitle(birdname)
-% 
+
 % % save
-% fn = fullfile(d, append(birdname, '_call_consistency.pdf'));
-% fprintf('Saving %s ...', fn)
-% exportgraphics(f, fn,...
-%     'ContentType', 'vector')
-% fprintf(' done\n')
+fn = fullfile(d, append(birdname, '_call_consistency.pdf'));
+fprintf('Saving %s ...', fn)
+exportgraphics(f, fn,...
+    'ContentType', 'vector')
+fprintf(' done\n')
