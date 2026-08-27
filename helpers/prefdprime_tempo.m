@@ -1,4 +1,4 @@
-function prefsi_tempo(savedir, birdname)
+function prefdprime_tempo(savedir, birdname)
 
 % load data
 stims = {'ZF', 'MP', 'LP'};
@@ -40,13 +40,17 @@ for i = 1:length(sessions)
     sessiondata = sortrows(sessiondata, ["Stimulus", "GapChange"], 'descend');
     
     stimuli = unique(sessiondata.StimNum, 'stable');
-    Ms = mean(sessiondata.NormCalls);
-    
+
     Y = nan(1, length(stimuli));
     
     for j = 1:length(stimuli)
         stimulusdata = sessiondata(strcmp(sessiondata.StimNum, stimuli(j)),:);
-        Y(j) = stimulusdata.NormCalls/Ms;
+        otherstims = sessiondata(~strcmp(sessiondata.StimNum, stimuli(j)),:);
+        
+        a = stimulusdata.NormCalls;
+        b = otherstims.NormCalls;
+        
+        Y(j) = calcd(a, b);
         color = cm(strcmp(stims, unique(stimulusdata.Stimulus)), :);
         
         plot(ax(i), j, Y(j),...
@@ -69,7 +73,7 @@ for i = 1:length(sessions)
     xticklabels(sessiondata.GapChange)
     xlim([0.5 length(stimuli)+0.5])
     ylim([ax(i).YLim(1)-0.5 ax(i).YLim(2)+0.5])
-    ylabel(ax,'Selectivity index',...
+    ylabel(ax,'d''',...
         'FontWeight', 'bold')
     title(['Session ', num2str(i)])
     set(ax(i) ,'Layer', 'Top')
@@ -80,7 +84,7 @@ linkaxes(ax, 'y')
 sgtitle(birdname)
 
 % save
-fn = fullfile(d, append(birdname, '_SI_by_session.pdf'));
+fn = fullfile(d, append(birdname, '_dprime_by_session.pdf'));
 fprintf('Saving %s ...', fn)
 exportgraphics(f, fn,...
     'ContentType', 'vector')
@@ -128,17 +132,20 @@ xticks(1:length(stimuli))
 xticklabels(sessiondata.GapChange)
 xlim([0.5 length(stimuli)+0.5])
 ylim([ax.YLim(1)-0.5 ax.YLim(2)+0.5])
-ylabel(ax,'Selectivity index',...
+ylabel(ax,'d''',...
     'FontWeight', 'bold')
 set(ax, 'Layer', 'Top')
 
 sgtitle(birdname)
 
 % save
-fn = fullfile(d, append(birdname, '_SI_average.pdf'));
+fn = fullfile(d, append(birdname, '_dprime_average.pdf'));
 fprintf('Saving %s ...', fn)
 exportgraphics(f, fn,...
     'ContentType', 'vector')
 fprintf(' done\n')
 
 clear f
+
+function d = calcd(a, b)
+d = (2*(mean(a)-mean(b)))/(sqrt((std(a)^2) + (std(b)^2)));

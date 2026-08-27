@@ -1,10 +1,7 @@
-function prefsi_tempo(savedir, birdname)
+function prefdprime(savedir, birdname)
 
 % load data
-stims = {'ZF', 'MP', 'LP'};
-cm = [242,211,137;... % ZF
-    35,185,184; ... % MP
-    54,97,97]./255; % LP
+cm = [69,129,92; 166,195,177]./255;
 d = cell2mat(uigetfile_n_dir(fullfile(savedir, birdname)));
 D = readtable(fullfile(d, append(birdname, '_calls.csv')));
 
@@ -12,6 +9,7 @@ D = readtable(fullfile(d, append(birdname, '_calls.csv')));
 D = D(strcmp(D.BlockType, 'Block'),:);
 
 sessions = sort(unique(D.Session));
+stims = unique(D.Stimulus);
 
 % plot across sessions
 f = figure;
@@ -24,6 +22,21 @@ tiledlayout(round(length(sessions)/2), 2,...
 allY = [];
 
 for i = 1:length(sessions)
+    sessiondata = D(D.Session == sessions(i),:);
+    Y = nan(1, length(stims));
+    
+    for j = 1:length(stims)
+        stimulusdata = sessiondata(contains(sessiondata.Stimulus, stims(j)),:);
+        otherstims = sessiondata(~contains(sessiondata.Stimulus, stims(j)),:);
+        
+        a = stimulusdata.NumCalls;
+        b = otherstims.NumCalls;
+        
+        Y(j) = calcd(a, b);
+    end
+    
+    allY = [allY; Y];
+    
     ax(i) = nexttile;
     
     set(ax(i), 'TickDir', 'out',...
@@ -35,40 +48,17 @@ for i = 1:length(sessions)
         'FontName','Arial')
     hold on
     
-    sessiondata = D(D.Session == sessions(i),:);
-    sessiondata = sortrows(sessiondata, ["Stimulus", "GapChange"], 'descend');
+    plot(ax(i), Y,...
+        'Marker', 'o',...
+        'MarkerSize', 8,...
+        'MarkerFaceColor', cm(1,:),...
+        'Color', cm(1,:),...
+        'LineWidth', 1.5)
     
-    stimuli = unique(sessiondata.StimNum);
-    
-    Ms = mean(sessiondata.NumCalls);
-    sems = std(sessiondata.NumCalls)/sqrt(height(sessiondata));
-    
-    Y = nan(1, length(stimuli));
-    
-    for j = 1:length(stimuli)
-        stimulusdata = sessiondata(strcmp(sessiondata.StimNum, stimuli(j)),:);
-        Y(j) = stimulusdata.NumCalls/Ms;
-        color = cm(strcmp(stims, unique(stimulusdata.Stimulus)), :);
-        
-        plot(ax(i), j, Y(j),...
-            'Marker', 'o',...
-            'MarkerSize', 8,...
-            'MarkerFaceColor', color)
-    end
-    
-    X = 1:length(stimuli);
-    
-    p = plot(ax(i), X, Y,...
-        'Marker', 'none',...
-        'Color', 'k',...
-        'LineWidth', 1.5);
-    
-    uistack(p, 'bottom')
-
     xticks(1:length(stims))
     xticklabels(stims)
     xlim([0.5 length(stims)+0.5])
-    ylabel(ax,'Selectivity index',...
+    ylabel(ax,'d''',...
         'FontWeight', 'bold')
     title(['Session ', num2str(i)])
     set(ax(i) ,'Layer', 'Top')
@@ -78,7 +68,7 @@ linkaxes(ax, 'y')
 sgtitle(birdname)
 
 % save
-fn = fullfile(d, append(birdname, '_SI_by_session.pdf'));
+fn = fullfile(d, append(birdname, '_dprime_by_session.pdf'));
 fprintf('Saving %s ...', fn)
 exportgraphics(f, fn,...
     'ContentType', 'vector')
@@ -115,17 +105,20 @@ errorbar(X, Y, sem,...
 xticks(1:length(stims))
 xticklabels(stims)
 xlim([0.5 length(stims)+0.5])
-ylabel(ax,'Selectivity index',...
+ylabel(ax,'d''',...
     'FontWeight', 'bold')
 set(ax, 'Layer', 'Top')
 
 sgtitle(birdname)
 
 % save
-fn = fullfile(d, append(birdname, '_SI_average.pdf'));
+fn = fullfile(d, append(birdname, '_dprime_average.pdf'));
 fprintf('Saving %s ...', fn)
 exportgraphics(f, fn,...
     'ContentType', 'vector')
 fprintf(' done\n')
 
 clear f
+
+function d = calcd(a, b)
+d = (2*(mean(a)-mean(b)))/(sqrt((std(a)^2) + (std(b)^2)));

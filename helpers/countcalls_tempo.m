@@ -36,7 +36,7 @@ switch sv
             
             for i = 1:length(es)
                done = append('session_', num2str(es(i))); 
-               sessions = sessions(~contains({sessions.name}, done));
+               sessions = sessions(~strcmp({sessions.name}, done));
             end
             
             if isempty(sessions)

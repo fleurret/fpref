@@ -1,8 +1,8 @@
 %% SET VARIABLES
 
-birdname = 'wh26wh27';
+birdname = 'or87yw46';
     %'wh26wh27'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
-savedir = 'D:\Brainard\Analysis\Female preference';
+savedir = 'X:\Brainard\Analysis\Female preference';
 
 %% ANALYSIS -- STIMULUS PREFERENCE
         
@@ -24,6 +24,11 @@ savedir = 'D:\Brainard\Analysis\Female preference';
         % across sessions
         
         prefsi(savedir, birdname)
+        
+        %% dprime
+        % calculates and plots d' for each session/average across sessions
+        
+        prefdprime(savedir, birdname)
 
 %% ANALYSIS -- TEMPO PREFERENCE
 
@@ -51,5 +56,10 @@ savedir = 'D:\Brainard\Analysis\Female preference';
         % across sessions
         
         prefsi_tempo(savedir, birdname)
+        
+        %% dprime
+        % calculates and plots d' for each session/average across sessions
+        
+        prefdprime_tempo(savedir, birdname)
 
         

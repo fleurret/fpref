@@ -33,13 +33,13 @@ subf = 'pref_retest';
 
         %% Split channels
         % select session folder(s)
-        % SplitandSeg(filedir, savedir, birdname)
+        % SplitandSeg(filedir, savedir, birdname, subf)
         
-        SplitandSeg(filedir, savedir, birdname)
+        SplitandSeg(filedir, savedir, birdname, subf)
         
         %% Compare channels
         % select session folder(s)
-        % CompareAllJamming(savedir, birdname, SnippetSubsampleDur, sqf)
+        % CompareAllJamming(savedir, birdname, subf, SnippetSubsampleDur, sqf)
         % subf: subfolder name
         % SnippetSubSampleDur: in s
         % sqf: square and filter songs (0: no, 1: yes)
@@ -53,10 +53,10 @@ subf = 'pref_retest';
         % sqf: square and filter songs
         %   0: no, 1: yes
         
-        CompareAllJamming_file(savedir, birdname, 'tempo_test', 0.02, 1)
+        CompareAllJamming_file(savedir, birdname, subf, 0.02, 1)
 
         %% Organize files for export
-        exportfiles(savedir, birdname, 'tempo_test')
+        exportfiles(savedir, birdname, subf)
         
         %% Check for missing/mislabeled calls
          
