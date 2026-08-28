@@ -46,7 +46,13 @@ for i = 1:length(sessions)
     
     for j = 1:length(stimuli)
         stimulusdata = sessiondata(strcmp(sessiondata.StimNum, stimuli(j)),:);
-        Y(j) = stimulusdata.NormCalls/Ms;
+        
+        if isnan(stimulusdata.NormCalls/Ms)
+            Y(j) = 1;
+        else
+            Y(j) = stimulusdata.NormCalls/Ms;
+        end
+        
         color = cm(strcmp(stims, unique(stimulusdata.Stimulus)), :);
         
         plot(ax(i), j, Y(j),...

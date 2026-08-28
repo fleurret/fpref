@@ -2,7 +2,16 @@
 
 birdname = 'or87yw46';
     %'wh26wh27'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
-savedir = 'X:\Brainard\Analysis\Female preference';
+savedir = 'Y:\Brainard\Analysis\Female preference';
+
+%% CONCATENATE DATA FOR R
+
+        %% Combined subject .csv
+        % saves a CSV file with all subjects for R analysis
+        % concat_data(savedir, type)
+        % type: 'testing', 'pref_retest', 'tempo_test'
+        
+        concat_data(savedir, 'testing')
 
 %% ANALYSIS -- STIMULUS PREFERENCE
         

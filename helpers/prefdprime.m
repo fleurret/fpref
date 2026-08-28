@@ -32,7 +32,11 @@ for i = 1:length(sessions)
         a = stimulusdata.NumCalls;
         b = otherstims.NumCalls;
         
-        Y(j) = calcd(a, b);
+        if isnan(calcd(a, b))
+            Y(j) = 0;
+        else
+            Y(j) = calcd(a, b);
+        end
     end
     
     allY = [allY; Y];

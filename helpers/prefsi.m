@@ -30,7 +30,13 @@ for i = 1:length(sessions)
     
     for j = 1:length(stims)
         stimulusdata = sessiondata(contains(sessiondata.Stimulus, stims(j)),:);
-        Y(j) = stimulusdata.NumCalls/Ms;
+        
+        if isnan(stimulusdata.NumCalls/Ms)
+            Y(j) = 1;
+        else
+            Y(j) = stimulusdata.NumCalls/Ms;
+        end
+        
     end
     
     allY = [allY; Y];

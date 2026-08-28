@@ -50,7 +50,12 @@ for i = 1:length(sessions)
         a = stimulusdata.NormCalls;
         b = otherstims.NormCalls;
         
-        Y(j) = calcd(a, b);
+        if isnan(calcd(a, b))
+            Y(j) = 0;
+        else
+            Y(j) = calcd(a, b);
+        end
+        
         color = cm(strcmp(stims, unique(stimulusdata.Stimulus)), :);
         
         plot(ax(i), j, Y(j),...
