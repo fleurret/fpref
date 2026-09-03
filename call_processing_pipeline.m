@@ -1,16 +1,20 @@
 %% SET VARIABLES
 
-birdname = 'or87yw46'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
+birdname = 'bu95bu15';
+            %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
 sex = 'female';
 
-filedir = fullfile('\\macaw.ucsf.edu\users\public\mikey_public\female_preference', birdname, 'exp_data');
+% filedir = fullfile('\\macaw.ucsf.edu\users\public\mikey_public\female_preference', birdname);
+filedir = fullfile('Y:\public\screening', birdname);
 savedir = 'E:\rose\analysis\female preference\'; % base folder for save files
+subf = 'juv_screen';
 
 %% SCREENING
 
         %% WhisperSeg
-
-        WhispSegScreenDir(filedir,birdname,sex)
+        
+        cd(filedir)
+        WhispSegScreenDir(filedir, birdname, sex)
 
         %% Pull files from screening day X
         % puts WhisperSeg files from all other days into a separate
@@ -21,7 +25,8 @@ savedir = 'E:\rose\analysis\female preference\'; % base folder for save files
         screeningday(filedir, savedir, birdname, 2)
 
         %% PhenotypeBird
-
+       
+        cd(savedir)
         PhenotypeBird(birdname)
 
         %% Check on evsonganaly
@@ -32,30 +37,30 @@ savedir = 'E:\rose\analysis\female preference\'; % base folder for save files
 
         %% Split channels
         % select session folder(s)
-        % SplitandSeg(filedir, savedir, birdname)
+        % SplitandSeg(filedir, savedir, birdname, subf)
         
-        SplitandSeg(filedir, savedir, birdname)
+        SplitandSeg(filedir, savedir, birdname, subf)
         
         %% Compare channels
         % select session folder(s)
-        % CompareAllJamming(savedir, birdname, SnippetSubsampleDur, sqf)
+        % CompareAllJamming(savedir, birdname, subf, SnippetSubsampleDur, sqf)
         % subf: subfolder name
         % SnippetSubSampleDur: in s
         % sqf: square and filter songs (0: no, 1: yes)
         
-        CompareAllJamming(savedir, birdname, 'tempo_test', 0.02, 1)
+        CompareAllJamming(savedir, birdname, subf, 0.02, 1)
         
         %% Compare channels for specific files
         % select individual .wav files (whichever channel for each block)
-        % CompareAllJamming_file(savedir, birdname, SnippetSubsampleDur, sqf)
+        % CompareAllJamming_file(savedir, birdname, subf, SnippetSubsampleDur, sqf)
         % SnippetSubSampleDur: in s
         % sqf: square and filter songs
         %   0: no, 1: yes
         
-        CompareAllJamming_file(savedir, birdname, 'tempo_test', 0.02, 0)
+        CompareAllJamming_file(savedir, birdname, subf, 0.02, 1)
 
         %% Organize files for export
-        exportfiles(savedir, birdname, 'tempo_test')
+        exportfiles(savedir, birdname, subf)
         
         %% Check for missing/mislabeled calls
         
