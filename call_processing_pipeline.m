@@ -1,17 +1,20 @@
 %% SET VARIABLES
 
-birdname = 'or25rd67'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'; 'wh26wh27'
+birdname = 'yw51gr72';
+            %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
 sex = 'female';
 
-filedir = fullfile('\\macaw.ucsf.edu\users\public\mikey_public\female_preference', birdname, 'exp_data');
-savedir = 'D:\Brainard\Analysis\Female preference'; % base folder for save files
-subf = 'pref_retest';
+% filedir = fullfile('\\macaw.ucsf.edu\users\public\mikey_public\female_preference', birdname);
+filedir = fullfile('Y:\public\screening', birdname);
+savedir = 'E:\rose\analysis\female preference\'; % base folder for save files
+subf = 'juv_screen';
 
 %% SCREENING
 
         %% WhisperSeg
-
-        WhispSegScreenDir(filedir,birdname,sex)
+        
+        cd(filedir)
+        WhispSegScreenDir(filedir, birdname, sex)
 
         %% Pull files from screening day X
         % puts WhisperSeg files from all other days into a separate
@@ -22,7 +25,8 @@ subf = 'pref_retest';
         screeningday(filedir, savedir, birdname, 2)
 
         %% PhenotypeBird
-
+       
+        cd(savedir)
         PhenotypeBird(birdname)
 
         %% Check on evsonganaly
@@ -48,7 +52,7 @@ subf = 'pref_retest';
         
         %% Compare channels for specific files
         % select individual .wav files (whichever channel for each block)
-        % CompareAllJamming_file(savedir, birdname, SnippetSubsampleDur, sqf)
+        % CompareAllJamming_file(savedir, birdname, subf, SnippetSubsampleDur, sqf)
         % SnippetSubSampleDur: in s
         % sqf: square and filter songs
         %   0: no, 1: yes
@@ -59,6 +63,6 @@ subf = 'pref_retest';
         exportfiles(savedir, birdname, subf)
         
         %% Check for missing/mislabeled calls
-         
+        
         evsonganaly
                     
