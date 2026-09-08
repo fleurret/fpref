@@ -60,10 +60,10 @@ switch sv
             
             % load timestamps and params
             ts = dir(fullfile(d, sessions(i).name, '*.txt'));
-%             o = ts(contains({ts.name}, 'OnsetLog'));
+            o = ts(contains({ts.name}, 'OnsetLog'));
             p = ts(contains({ts.name}, 'Params'));
             
-%             timestamps = readtable(fullfile(o.folder, o.name), 'ReadVariableNames',false);
+            timestamps = readtable(fullfile(o.folder, o.name), 'ReadVariableNames',false);
             params = readtable(fullfile(p.folder, p.name), 'ReadVariableNames',false);
             
             if isfolder(fullfile(sessions(i).folder, sessions(i).name, 'cmpJamm'))
@@ -75,7 +75,7 @@ switch sv
             allfiles = dir(sd);
             allfiles = allfiles(~ismember({allfiles.name}, {'.','..'}));
             callfiles = allfiles(endsWith({allfiles.name}, '.not.mat'));
-            wavfiles = allfiles(endsWith({allfiles.name}, '.wav'));
+%             wavfiles = allfiles(endsWith({allfiles.name}, '.wav'));
             
             % create tables
             blockdata = table('size',[length(callfiles) 13],...
@@ -132,9 +132,9 @@ switch sv
                     end
                 end
                 
-                wfn = append(fp, bn(1), '.wav');
-                wav = wavfiles(contains({wavfiles.name}, wfn));
-                [wf, fs] = audioread(fullfile(wav.folder, wav.name));
+%                 wfn = append(fp, bn(1), '.wav');
+%                 wav = wavfiles(contains({wavfiles.name}, wfn));
+%                 [wf, fs] = audioread(fullfile(wav.folder, wav.name));
                 
                 % load mat data
                 data = load(fullfile(callfiles(j).folder, callfiles(j).name));
@@ -142,7 +142,7 @@ switch sv
                 % is it a block or post block
                 if contains(data.fname, 'Post')
                     block = fn{3};
-                    t = length(wf)/fs;
+                    t = 30;
                     
                     blockdata(j,:).Subject = birdname;
                     blockdata(j,:).Session = session;
@@ -161,24 +161,25 @@ switch sv
                 else
                     
                     % match timestamps
-
-%                     idx = strcmp(timestamps.Var4, block);
-%                     
-%                     if sum(idx) == 0
-%                         brow = 0;
-%                         block_onset = timestamps.Var2(brow+1);
-%                     else
-%                         brow = find(idx == 1);
-%                         block_onset = timestamps.Var2(brow+1) - timestamps.Var2(brow);
-%                     end
-%                     
-%                     block_offset = block_onset + duration(seconds(t), 'format', 'hh:mm:ss.SSS');
-%                     
-                    % get timestamps from segmented wavs - more accurate
-                    ch2seg = round(wf(:,5));
-                    block_onset = duration(seconds(min(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
-                    block_offset = duration(seconds(max(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
+                    idx = strcmp(timestamps.Var4, block);
+                    
+                    if sum(idx) == 0
+                        brow = 0;
+                        block_onset = timestamps.Var2(brow+1);
+                        block_offset = timestamps.Var2(brow+2);
+                    else
+                        brow = find(idx == 1);
+                        block_onset = timestamps.Var2(brow+1) - timestamps.Var2(brow);
+                        block_offset = timestamps.Var2(brow+2) - timestamps.Var2(brow);
+                    end
+                    
                     t = seconds(block_offset - block_onset);
+                   
+                    % get timestamps from segmented wavs - more accurate
+%                     ch2seg = round(wf(:,5));
+%                     block_onset = duration(seconds(min(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
+%                     block_offset = duration(seconds(max(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
+%                     t = seconds(block_offset - block_onset);
                     
                     % remove preblock calls
                     onsets = sort(data.onsets);
