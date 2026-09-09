@@ -1,9 +1,16 @@
 %% SET VARIABLES
 
-birdname = 'or87yw46';
+birdname = 'or25rd67';
     %'wh26wh27'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
-savedir = 'Y:\Brainard\Analysis\Female preference';
+savedir = 'X:\Brainard\Analysis\Female preference';
+subf = 'tempo_test';
 
+
+%% EVSONGANALY
+        sf = uigetdir(fullfile(savedir, birdname, subf));
+        cd(sf)
+        evsonganaly
+        
 %% CONCATENATE DATA FOR R
 
         %% Combined subject .csv

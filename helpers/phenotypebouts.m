@@ -1,5 +1,6 @@
-birdname = 'pu15bk16'; %'rd18gr48';
-filedir = fullfile('D:\Brainard\Analysis\Female preference\Stimuli', birdname);
+birdname = 'pk82rd13';
+            % 'pu15bk16';'rd18gr48';
+filedir = fullfile('X:\Brainard\Analysis\Female preference\Stimuli', birdname);
 
 d = getdirs(filedir);
 
@@ -80,7 +81,6 @@ for i = 1:length(variants)
 end
 
 % plot
-
 f = figure;
 f.Position = [0, 0, 500, 300];
 
