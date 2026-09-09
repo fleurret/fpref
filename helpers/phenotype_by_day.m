@@ -13,7 +13,6 @@ d = d(~ismember({d.name},{'.','..','.DS_Store'}));
 allfiles = sort({d.name});
 allfiles = erase(allfiles, append(birdname, '_'));
 
-
 dates = {};
 for i = 1:length(allfiles)
     temp = cell2mat(allfiles(i));
