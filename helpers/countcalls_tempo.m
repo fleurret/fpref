@@ -11,6 +11,7 @@ function countcalls_tempo(savedir, birdname, sv)
 % D:\Analysis\or87yw46\session_2, etc. and
 % D:\Analysis\or87yw46\or87yw46_OnsetLog.txt)
 
+stims = {'ZF', 'MP', 'LP'};
 cm = [242,211,137;... % ZF
     35,185,184; ... % MP
     54,97,97]./255; % LP
@@ -25,14 +26,32 @@ switch sv
         end
         
     case 'save'
-        sessions = dir(d);
-        sessions = sessions(~ismember({sessions.name},{'.','..'}));
-        sessions = sessions([sessions.isdir]);
+        if isfile(fullfile(d, append(birdname, '_calls.csv')))
+            D = readtable(fullfile(d, append(birdname, '_calls.csv')));
+            sessions = dir(d);
+            sessions = sessions(~ismember({sessions.name},{'.','..'}));
+            sessions = sessions([sessions.isdir]);
+            
+            es = unique(D.Session);
+            
+            for i = 1:length(es)
+                done = append('session_', num2str(es(i)));
+                sessions = sessions(~strcmp({sessions.name}, done));
+            end
+            
+            if isempty(sessions)
+                error('No new data to add :)')
+            end
+        else
+            D = [];
+            sessions = dir(d);
+            sessions = sessions(~ismember({sessions.name},{'.','..'}));
+            sessions = sessions([sessions.isdir]);
+        end
         
         % table headers
         headers = {'Subject', 'Session', 'Stimulus', 'StimNum', 'GapChange', 'Block', 'BlockType',...
             'NumCalls', 'TimeS', 'Q1Pct', 'Q2Pct', 'Q3Pct', 'Q4Pct'};
-        D = [];
         
         % sessions
         for i = 1:length(sessions)
@@ -56,8 +75,9 @@ switch sv
             allfiles = dir(sd);
             allfiles = allfiles(~ismember({allfiles.name}, {'.','..'}));
             callfiles = allfiles(endsWith({allfiles.name}, '.not.mat'));
-%             wavfiles = allfiles(endsWith({allfiles.name}, '.wav'));
+            %             wavfiles = allfiles(endsWith({allfiles.name}, '.wav'));
             
+            % create tables
             % create tables
             blockdata = table('size',[length(callfiles) 13],...
                 'variabletypes',["string","string", "string","string","string","string","string",...
@@ -78,7 +98,7 @@ switch sv
                     var1 = pinfo.Var1;
                     n = {};
                     for k = 1:length(var1)
-                       n(k) = extract(var1(k), digitsPattern);
+                        n(k) = extract(var1(k), digitsPattern);
                     end
                     
                     idx = strcmp(n, sn);
@@ -96,26 +116,15 @@ switch sv
                 else
                     V = {0};
                 end
-
+                
                 % load wav
                 bn = split(fn(end), '.');
                 if contains(bn{1}, 'Ch1')
-                    block = erase(bn{1}, 'Ch1');
                 end
                 
-                rbn = fn(1:end-1);
-                fp = '';
-                for k = 1:length(rbn)
-                    if k ==- length(rbn)
-                        fp = append(fp, rbn(k));
-                    else
-                        fp = append(fp, rbn(k), '-');
-                    end
-                end
-                
-%                 wfn = append(fp, bn(1), '.wav');
-%                 wav = wavfiles(contains({wavfiles.name}, wfn));
-%                 [wf, fs] = audioread(fullfile(wav.folder, wav.name));
+                %                 wfn = append(fp, bn(1), '.wav');
+                %                 wav = wavfiles(contains({wavfiles.name}, wfn));
+                %                 [wf, fs] = audioread(fullfile(wav.folder, wav.name));
                 
                 % load mat data
                 data = load(fullfile(callfiles(j).folder, callfiles(j).name));
@@ -138,7 +147,7 @@ switch sv
                     blockdata(j,:).Q2Pct = NaN;
                     blockdata(j,:).Q3Pct = NaN;
                     blockdata(j,:).Q4Pct = NaN;
-                
+                    
                 else
                     
                     % match timestamps
@@ -155,12 +164,12 @@ switch sv
                     end
                     
                     t = seconds(block_offset - block_onset);
-                   
+                    
                     % get timestamps from segmented wavs - more accurate
-%                     ch2seg = round(wf(:,5));
-%                     block_onset = duration(seconds(min(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
-%                     block_offset = duration(seconds(max(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
-%                     t = seconds(block_offset - block_onset);
+                    %                     ch2seg = round(wf(:,5));
+                    %                     block_onset = duration(seconds(min(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
+                    %                     block_offset = duration(seconds(max(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
+                    %                     t = seconds(block_offset - block_onset);
                     
                     % remove preblock calls
                     onsets = sort(data.onsets);
@@ -212,7 +221,6 @@ end
 % only blocks
 D = D(strcmp(D.BlockType, 'Block'),:);
 sessions = sort(str2double(unique(D.Session)));
-stims = flip(sort(unique(D.Stimulus)));
 
 % plot across sessions
 f = figure;
@@ -240,7 +248,8 @@ for i = 1:length(sessions)
     for j = 1:length(stims)
         
         typedata = sessiondata(strcmp(sessiondata.Stimulus, stims(j)),:);
-    
+        %         typedata = sessiondata(j,:);
+        
         X = start+1:start+height(typedata);
         Y = typedata.NumCalls ./ typedata.TimeS;
         
@@ -266,67 +275,17 @@ linkaxes(ax, 'y')
 sgtitle(birdname)
 
 % save
-% fn = fullfile(d, append(birdname, '_calls_by_session.pdf'));
-% fprintf('Saving %s ...', fn)
-% exportgraphics(f, fn,...
-%     'ContentType', 'vector')
-% fprintf(' done\n')
+fn = fullfile(d, append(birdname, '_calls_by_session.pdf'));
+fprintf('Saving %s ...', fn)
+exportgraphics(f, fn,...
+    'ContentType', 'vector')
+fprintf(' done\n')
 
 clear f
 
 % plot average
 f = figure;
 f.Position = [0, 0, 500, 300];
-% tiledlayout(2, 1,...
-%     'Padding', 'compact',...
-%     'TileSpacing', 'compact');
-%  
-% ax(1) = nexttile;
-start = 0;
-
-% total for each stimulus
-% for i = 1:length(stims)
-%     hold on
-%     stimulusdata = D(contains(D.Stimulus, stims(i)),:);
-%     stimulusdata = sortrows(stimulusdata, "GapChange", 'descend');
-%     gaps = flip(unique(stimulusdata.GapChange));
-%     
-%     X = start+1:start+length(gaps);
-%     Y = nan(1, length(gaps));
-%     sem = nan(1, length(gaps));
-%     
-%     for j = 1:length(gaps)
-%        gapdata = stimulusdata(stimulusdata.GapChange == gaps(j),:); 
-%        Y(j) = mean(gapdata.NumCalls);
-%        sem(j) = std(gapdata.NumCalls)/sqrt(height(gapdata));
-%     end
-%     
-%     start = start+length(gaps);
-%     
-%     b = bar(ax(1), X, Y,...
-%         'LineStyle', 'none',...
-%         'FaceColor', cm(i,:));
-%     
-% %     postblock = stimulusdata(contains(stimulusdata.BlockType, 'Post'),:);
-% %     block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
-% %     
-% %     calls = [sum(block.NumCalls) sum(postblock.NumCalls)];
-% %     b = bar(ax(1), i, calls, 'stacked',...
-% %         'LineStyle', 'none');
-% %     set(b(1),...
-% %         'FaceColor', cm(1,:))
-% %     set(b(2),...
-% %         'FaceColor', cm(2,:))
-% 
-% end
-% 
-% xticks(1:length(sessiondata.GapChange))
-% xticklabels(sessiondata.GapChange)
-% ylabel(ax(1),'Total calls',...
-%     'FontWeight', 'bold')
-
-% as a percentage
-% ax(2) = nexttile;
 
 ax = gca;
 hold on
@@ -359,8 +318,8 @@ for i = 1:length(stims)
     end
     
     X = [start+1:start+length(variants)];
-    start = start+length(variants);   
-
+    start = start+length(variants);
+    
     b(i) = bar(ax, X, Y,...
         'LineStyle', 'none',...
         'FaceColor', cm(i,:));
@@ -405,64 +364,67 @@ fprintf(' done\n')
 
 clear f
 
-% % plot consistency of calls?
-% f = figure;
-% f.Position = [0, 0, 800, 350];
-% tiledlayout(2, 2,...
-%     'Padding', 'compact',...
-%     'TileSpacing', 'compact');
-% 
-% stims = sort(stims);
-% Q = nan(length(stims), 4);
-% sem = nan(length(stims), 4);
-% 
-% for i = 1:length(stims)
-%     stimulusdata = D(contains(D.Stimulus, stims(i)),:);
-%     block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
-%     
-%     cvars = contains(block.Properties.VariableNames, 'Q');
-%     cinfo = block(:, cvars);
-%     
-%     for j = 1:4
-%         Q(i,j) = mean(table2array(cinfo(:,j)), 'omitnan');
-%         sem(i,j) = std(table2array(cinfo(:,j)), 'omitnan')/sqrt(height(cinfo));
-%     end
-% end
-% 
-% for i = 1:4
-%     ax(i) = nexttile;
-%     hold on
-%     bar(ax(i), Q(:,i)',...
-%         'FaceColor', cm(1,:),...
-%         'LineStyle', 'none')
-%     errorbar(ax(i), Q(:,i)', sem(:,i)',...
-%         'Marker', 'none',...
-%         'Color', 'k',...
-%         'LineStyle', 'none',...
-%         'LineWidth', 1.5,...
-%         'CapSize', 0)
-%     
-%     xticks(1:length(stims))
-%     xticklabels(stims)
-%     ylabel(ax(i),'% total calls to song',...
-%         'FontWeight', 'bold')
-%     
-%     set(ax(i), 'TickDir', 'out',...
-%         'XTickLabelRotation', 0,...
-%         'TickLength', [0.02,0.02],...
-%         'LineWidth', 1.5);
-%     set(findobj(ax(i),'-property','FontName'),...
-%         'FontSize', 9,...
-%         'FontName','Arial')
-%     set(ax(i),'Layer', 'Top')
-%     title(ax(i), append('Q ', num2str(i)));
-% end
-% 
-% sgtitle(birdname)
-% 
+% % plot consistency of calls
+f = figure;
+f.Position = [0, 0, 800, 350];
+tiledlayout(2, 2,...
+    'Padding', 'compact',...
+    'TileSpacing', 'compact');
+
+D = sortrows(D, ["Stimulus", "GapChange"], 'descend');
+stimuli = unique(D.StimNum, 'stable');
+
+for i = 1:4
+    Q = nan(1, length(stimuli));
+    sem = nan(1, length(stimuli));
+    
+    ax(i) = nexttile;
+    hold on
+    
+    for j = 1:length(stimuli)
+        stimulusdata = D(strcmp(D.StimNum, stimuli(j)),:);
+        
+        Qi = stimulusdata(:, contains(stimulusdata.Properties.VariableNames, 'Q'));
+        X = j;
+        Y = mean(table2array(Qi(:,i)), 'omitnan');
+        sem = std(table2array(Qi(:,i)), 'omitnan')/sqrt(height(Qi));
+        
+        color = cm(strcmp(stims, unique(stimulusdata.Stimulus)), :);
+        
+        bar(ax(i), X, Y,...
+            'FaceColor', color,...
+            'LineStyle', 'none')
+        errorbar(X, Y, sem,...
+            'Marker', 'none',...
+            'Color', 'k',...
+            'LineStyle', 'none',...
+            'LineWidth', 1.5,...
+            'CapSize', 0)
+    end
+    
+    xticks(1:length(stimuli))
+    xticklabels(sessiondata.GapChange)
+    xlabel(ax(i), 'Gap change (%)',...
+        'FontWeight', 'bold')
+    ylabel(ax(i),'% total calls to song',...
+        'FontWeight', 'bold')
+    
+    set(ax(i), 'TickDir', 'out',...
+        'XTickLabelRotation', 0,...
+        'TickLength', [0.02,0.02],...
+        'LineWidth', 1.5);
+    set(findobj(ax(i),'-property','FontName'),...
+        'FontSize', 9,...
+        'FontName','Arial')
+    set(ax(i),'Layer', 'Top')
+    title(ax(i), append('Q ', num2str(i)));
+end
+
+sgtitle(birdname)
+
 % % save
-% fn = fullfile(d, append(birdname, '_call_consistency.pdf'));
-% fprintf('Saving %s ...', fn)
-% exportgraphics(f, fn,...
-%     'ContentType', 'vector')
-% fprintf(' done\n')
+fn = fullfile(d, append(birdname, '_call_consistency.pdf'));
+fprintf('Saving %s ...', fn)
+exportgraphics(f, fn,...
+    'ContentType', 'vector')
+fprintf(' done\n')
