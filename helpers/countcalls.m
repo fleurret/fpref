@@ -38,7 +38,8 @@ switch sv
             session = erase(sessions(i).name, 'session_');
             
             % load timestamps
-            ts = dir(fullfile(d, sessions(i).name, '*.txt'));
+            txt = dir(fullfile(d, sessions(i).name, '*.txt'));
+            ts = txt(contains({txt.name}, 'OnsetLog'));
             
             if isempty(ts)
                 error('Timestamps file is missing :(')
@@ -97,7 +98,7 @@ switch sv
                     idx = strcmp(timestamps.stimulus_filepath, block);
                     brow = find(idx == 1);
                     block_onset = timestamps.timestamp_HH_MM_SS_mmm_(brow+1) - timestamps.timestamp_HH_MM_SS_mmm_(brow);
-                    block_offset = timestamps.timestamp_HH_MM_SS_mmm_(brow+2);
+                    block_offset = timestamps.timestamp_HH_MM_SS_mmm_(brow+2) - timestamps.timestamp_HH_MM_SS_mmm_(brow);
                     
                     % remove preblock calls
                     onsets = sort(data.onsets);
@@ -149,7 +150,8 @@ stims = unique(D.Stimulus);
 % plot across sessions
 f = figure;
 f.Position = [0, 0, 800, 1800];
-tiledlayout(length(sessions)/2, 2,...
+
+tiledlayout(round(length(sessions)/2), 2,...
     'Padding', 'compact',...
     'TileSpacing', 'compact');
 
