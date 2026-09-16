@@ -33,10 +33,10 @@ for i = 1:length(dates)
         for j = 1:length(dayfiles)
             copyfile(fullfile(dayfiles(j).folder, dayfiles(j).name),  fullfile(screen, date, dayfiles(j).name))
         end
-
-        % phenotypebird
-        PhenotypeBird_dir(screen, date, birdname)
     end
+
+    % phenotypebird
+    PhenotypeBird_dir(screen, date, birdname)
 end
 
 % plot histogram

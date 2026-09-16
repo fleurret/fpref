@@ -77,8 +77,7 @@ function output=PhenotypeBird_dir(screen, date, birdname)
 %    catch
 %    end;
 
-sf = dir(string(birdname));
-fn = fullfile(sf(1).folder, 'output.mat');
+fn = fullfile(screen, append(date, '.mat'));
 save(fn, "output")
 
 
