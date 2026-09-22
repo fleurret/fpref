@@ -5,7 +5,7 @@ gain = rms(Ch1) / rms(Ch2);
 Ch2 = Ch2 * gain;
 
 % is there a delay?
-[sims, lags] = xcorr(Ch1, Ch2);
+[sims, lags] = xcorr(Ch2, Ch1);
 [~, idx] = max(abs(sims));
 delay = lags(idx);
 
