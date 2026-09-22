@@ -3,6 +3,8 @@ function phenotype_by_day(filedir, savedir, birdname, age)
 f = uigetdir(filedir);
 cd(f)
 
+% WhispSegScreenDir(f, birdname, 'female')
+
 if ~isfolder(fullfile(f, birdname, 'calls'))
     WhispSegScreenDir(f, birdname, 'female')
 end
