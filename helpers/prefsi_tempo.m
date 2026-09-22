@@ -124,6 +124,10 @@ for i = 1:length(stimuli)
         'CapSize', 0)
 end
 
+legend('ZF', '', 'MP', '', '', '', '', '', '', 'LP',...
+    'AutoUpdate', 'off')
+legend('boxoff')
+
 p = plot(X, Y,...
     'Marker', 'none',...
     'Color', 'k',...
@@ -133,6 +137,8 @@ uistack(p, 'bottom')
 xticks(1:length(stimuli))
 xticklabels(sessiondata.GapChange)
 xlim([0.5 length(stimuli)+0.5])
+xlabel('% gap change',...
+    'FontWeight', 'bold')
 ylim([ax.YLim(1)-0.5 ax.YLim(2)+0.5])
 ylabel(ax,'Selectivity index',...
     'FontWeight', 'bold')

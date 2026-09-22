@@ -1,10 +1,68 @@
-function tempo_corr(savedir)
+function selectivity_corr(savedir)
 
 cm = [234,175,59;... % or87yw46
     188,188,188;... % wh26wh27
     201,55,55;... % or25rd67
     108,164,134;... % wh37gr58
     169,116,222]./255; % wh99pu92
+
+d = readtable(fullfile(savedir, 'female_phenotypes.csv'));
+subjects = [d.Subject];
+si = nan(1, length(subjects));
+dprime = nan(1, length(subjects));
+
+% calculate selectivity and dprime
+for i = 1:length(subjects)
+    prefdata = readtable(cell2mat(fullfile(savedir, subjects(i), 'testing', append(subjects(i), '_calls.csv'))));
+    
+    % only blocks
+    D = prefdata(strcmp(prefdata.BlockType, 'Block'),:);
+    
+    sessions = sort(unique(D.Session));
+    stims = unique(D.Stimulus);
+    SI = [];
+    Dprime = [];
+    
+    for j = 1:length(sessions)
+        sessiondata = D(D.Session == sessions(j),:);
+        
+        % selectivity index
+        Ms = mean(sessiondata.NumCalls);
+        sems = std(sessiondata.NumCalls)/sqrt(height(sessiondata));
+        
+        Y1 = nan(1, length(stims));
+        Y2 = nan(1, length(stims));
+        
+        for k = 1:length(stims)
+            stimulusdata = sessiondata(contains(sessiondata.Stimulus, stims(k)),:);
+            otherstims = sessiondata(~contains(sessiondata.Stimulus, stims(k)),:);
+            
+            % selectivity index
+            if isnan(stimulusdata.NumCalls/Ms)
+                Y1(k) = 1;
+            else
+                Y1(k) = stimulusdata.NumCalls/Ms;
+            end
+            
+            % dprime
+            a = stimulusdata.NumCalls;
+            b = otherstims.NumCalls;
+            
+            if isnan(calcd(a, b))
+                Y2(k) = 0;
+            else
+                Y2(k) = calcd(a, b);
+            end
+            
+        end
+        
+        SI = [SI; Y1];
+        Dprime = [Dprime; Y2];
+    end
+    
+    si(i) = max(mean(SI));
+    dprime(i) = max(mean(Dprime));
+end
 
 f = figure;
 f.Position = [0, 0, 600, 600];
@@ -13,15 +71,12 @@ tiledlayout(2, 2,...
     'Padding', 'compact',...
     'TileSpacing', 'compact');
 
-D = readtable(fullfile(savedir, 'female_phenotypes.csv'));
-subjects = [D.Subject];
-
 ax(1) = nexttile;
 hold on
 
 for i = 1:length(subjects)
-    bird = D(i,:);
-    scatter(ax(1), bird.JuvKDE, bird.MPTempo,...
+    bird = d(i,:);
+    scatter(ax(1), bird.JuvKDE, si(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(i,:),...
         'MarkerEdgeColor', 'none',...
@@ -33,8 +88,8 @@ legend(ax(1), subjects,...
     'AutoUpdate', 'off');
 legend('boxoff')
 
-xf = D.JuvKDE;
-yf = D.MPTempo;
+xf = d.JuvKDE;
+yf = si;
 
 if any(isnan(yf))
     r = ~isnan(yf);
@@ -64,14 +119,14 @@ if length(R) > 1
 end
 
 xlabel(ax(1), 'Juvenile KDE (calls/sec)')
-title('Most preferred stimulus')
+ylabel(ax(1), 'Maximum avg SI')
 
 ax(2) = nexttile;
 hold on
 
 for i = 1:length(subjects)
-    bird = D(i,:);
-    scatter(ax(2), bird.AdultKDE, bird.MPTempo,...
+    bird = d(i,:);
+    scatter(ax(2), bird.AdultKDE, si(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(i,:),...
         'MarkerEdgeColor', 'none',...
@@ -79,8 +134,8 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = D.AdultKDE;
-yf = D.MPTempo;
+xf = d.AdultKDE;
+yf = si;
 
 if any(isnan(yf))
     r = ~isnan(yf);
@@ -110,7 +165,7 @@ if length(R) > 1
 end
 
 xlabel(ax(2), 'Adult KDE (calls/sec)')
-title('Most preferred stimulus')
+ylabel(ax(2), 'Maximum avg SI')
 
 linkaxes(ax(1:2), 'xy')
 
@@ -118,8 +173,8 @@ ax(3) = nexttile;
 hold on
 
 for i = 1:length(subjects)
-    bird = D(i,:);
-    scatter(ax(3), bird.JuvKDE, bird.LPTempo,...
+    bird = d(i,:);
+    scatter(ax(3), bird.JuvKDE, dprime(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(i,:),...
         'MarkerEdgeColor', 'none',...
@@ -127,8 +182,8 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = D.JuvKDE;
-yf = D.LPTempo;
+xf = d.JuvKDE;
+yf = dprime;
 
 if any(isnan(yf))
     r = ~isnan(yf);
@@ -158,14 +213,14 @@ if length(R) > 1
 end
 
 xlabel(ax(3), 'Juvenile KDE (calls/sec)')
-title('Least preferred stimulus')
+ylabel(ax(3), 'Maximum avg dprime')
 
 ax(4) = nexttile;
 hold on
 
 for i = 1:length(subjects)
-    bird = D(i,:);
-    scatter(ax(4), bird.AdultKDE, bird.LPTempo,...
+    bird = d(i,:);
+    scatter(ax(4), bird.AdultKDE, dprime(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(i,:),...
         'MarkerEdgeColor', 'none',...
@@ -173,8 +228,8 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = D.AdultKDE;
-yf = D.LPTempo;
+xf = d.AdultKDE;
+yf = dprime;
 
 if any(isnan(yf))
     r = ~isnan(yf);
@@ -204,14 +259,12 @@ if length(R) > 1
 end
 
 xlabel(ax(4), 'Adult KDE (calls/sec)')
-title('Least preferred stimulus')
+ylabel(ax(4), 'Maximum avg dprime')
 
 linkaxes(ax(3:4), 'xy')
 
 % axes etc
 for i = 1:4
-    ylabel(ax(i), 'Preferred stim tempo (syls/sec)')
-    
     set(ax(i), 'box', 'off',...
         'TickDir', 'out',...
         'XTickLabelRotation', 0,...
@@ -223,8 +276,12 @@ for i = 1:4
 end
 
 % save
-fn = fullfile(savedir, 'group_tempo_corr.pdf');
+fn = fullfile(savedir, 'group_selectivity_corr.pdf');
 fprintf('Saving %s ...', fn)
 exportgraphics(f, fn,...
     'ContentType', 'vector')
 fprintf(' done\n')
+
+
+function d = calcd(a, b)
+d = (2*(mean(a)-mean(b)))/(sqrt((std(a)^2) + (std(b)^2)));
