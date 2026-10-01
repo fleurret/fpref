@@ -1,4 +1,4 @@
-filedir = 'Y:\public\mikey_public\female_preference\tempo_stimuli';
+filedir = 'Y:\Brainard\Analysis\Female preference\Stimuli';
 birdnames = getdirs(filedir);
 D = [];
 

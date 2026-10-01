@@ -98,3 +98,47 @@ end
 legend(ax(i),...
     'Juvenile', 'Adult')
 legend(ax(i), 'boxoff')
+
+%%
+% d = readtable('Y:\Brainard\Analysis\Female preference\female_phenotypes.csv');
+
+cm = [234,175,59;... % or87yw46
+    188,188,188;... % wh26wh27
+    201,55,55;... % or25rd67
+    108,164,134;... % wh37gr58
+    169,116,222]./255; % wh99pu92
+
+f = figure;
+f.Position = [0, 0, 500, 200];
+ax = gca; 
+hold on
+
+subjects = unique(d.Subject);
+
+for i = 1:length(subjects)
+    s = d(contains(d.Subject, subjects(i)),:);
+    
+    plot([s.JuvDPH s.AdultDPH], [s.JuvKDE s.AdultKDE],...
+        'Marker', 'o',...
+        'MarkerFaceColor', cm(i,:),...
+        'MarkerEdgeColor', 'none',...
+        'MarkerSize', 8,...
+        'Color', cm(i,:),...
+        'LineWidth', 1.5)
+end
+
+ylim([0.5 1.5])
+xlabel('Days post-hatch')
+ylabel('Call KDE')
+
+set(ax, 'TickDir', 'out',...
+    'XTickLabelRotation', 0,...
+    'TickLength', [0.02,0.02],...
+    'LineWidth', 1.5);
+set(findobj(ax,'-property','FontName'),...
+    'FontSize', 9,...
+    'FontName','Arial')
+
+legend(subjects,...
+    'Location', 'Southeast')
+legend('boxoff')
