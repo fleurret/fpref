@@ -8,16 +8,39 @@ for z = 1:length(birdnames)
 
     % find normal stim
     nsdir = d(contains({d.name}, 'natural_tempo'));
-    nsdirpth = fullfile(nsdir.folder, nsdir.name);
-    nsfiles = dir(fullfile(nsdirpth, '*.not.mat'));
 
-    if isempty(nsfiles)
-        nswavs = dir(fullfile(nsdirpth, '*.wav'));
-        for i = 1:length(nswavs)
-            WhispSegFile(fullfile(nswavs(i).folder, nswavs(i).name))
+    if isempty(nsdir)
+        bouts = dir(fullfile(d.folder, d.name));
+        bouts = bouts(~contains({bouts.name}, '.'));
+
+        nsfiles = struct('folder', [], 'name', []);
+
+        for i = 1:length(bouts)
+            tf = dir(fullfile(bouts(i).folder, bouts(i).name, '*.not.mat'));
+
+            if isempty(tf)
+                f = dir(fullfile(bouts(i).folder, bouts(i).name, '*.wav'));
+                tf = f(contains({f.name},'25_gap_decrease'));
+                WhispSegFile(fullfile(tf.folder, tf.name))
+                nsfiles(i).folder = tf.folder;
+                nsfiles(i).name =(append(tf.name, '.not.mat'));
+            else
+                nsfiles(i).folder = tf.folder;
+                nsfiles(i).name = tf.name;
+            end
         end
-
+    else
+        nsdirpth = fullfile(nsdir.folder, nsdir.name);
         nsfiles = dir(fullfile(nsdirpth, '*.not.mat'));
+
+        if isempty(nsfiles)
+            nswavs = dir(fullfile(nsdirpth, '*.wav'));
+            for i = 1:length(nswavs)
+                WhispSegFile(fullfile(nswavs(i).folder, nswavs(i).name))
+            end
+
+            nsfiles = dir(fullfile(nsdirpth, '*.not.mat'));
+        end
     end
 
     headers = {'bout_id', 'change', 'syllables', 'length'};
