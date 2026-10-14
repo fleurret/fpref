@@ -523,7 +523,7 @@ for f = 1:length(d)
         % make sure number of labels match for evsonanaly
         % right now we dont really care what the labels are
         if length(NotMat1.labels) ~= length(NotMat1.onsets)
-            NotMat1.labels = NotMat1.labels(1:length(NotMat1.onsets));
+            NotMat1.labels = repelem('o', length(NotMat1.onsets));
         end
         
         try

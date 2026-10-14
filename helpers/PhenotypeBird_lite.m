@@ -71,3 +71,32 @@ function output=PhenotypeBird_lite(birdname)
 %    catch
 %    end;
 
+
+sf = dir(string(birdname));
+fn = fullfile(sf(1).folder, 'output.mat');
+save(fn, "output")
+
+% plot hist
+F = figure;
+F.Position = [0, 0, 500, 300];
+ax = gca;
+cm = [69,129,92]./255;
+
+set(ax, 'TickDir', 'out',...
+    'XTickLabelRotation', 0,...
+    'TickLength', [0.02,0.02],...
+    'LineWidth', 1.5);
+set(findobj(ax,'-property','FontName'),...
+    'FontSize', 9,...
+    'FontName','Arial')
+
+histogram(output.callmotifdurs/1000, 100,...
+    'FaceColor', cm,...
+    'EdgeColor', 'none')
+
+title(birdname)
+xlabel(ax, 'Call ITI (s)',...
+    'FontWeight', 'bold')
+ylabel(ax,'Frequency',...
+    'FontWeight', 'bold')
+set(ax,'Layer', 'Top')

@@ -1,35 +1,69 @@
 %% SET VARIABLES
 
-birdname = 'or87yw46';
-            %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
+birdname = 'yw51gr72';
+            %'or25rd67'; %'wh26wh27'; %'wh37gr58' 'or87yw46' 'wh99pu92';
 sex = 'female';
 
-filedir = fullfile('X:\Brainard\Analysis\Female preference', birdname);
-savedir = fullfile('X:\Brainard\Analysis\Female preference', birdname); % base folder for save files
-subf = 'calls';
+% filedir = fullfile('Y:\public\screening', birdname);
+% filedir = fullfile('Y:\public\adult_screening\female', birdname);
+filedir = fullfile('Y:\public\mikey_public\female_preference', birdname);
+savedir = 'F:\rose\analysis\female preference'; % base folder for save files
+subf = 'pref_test';
 
 %% SCREENING
 
         %% WhisperSeg
-        
-        cd(filedir)
-        WhispSegScreenDir(filedir, birdname, sex)
 
-        %% Pull files from screening day X
-        % puts WhisperSeg files from all other days into a separate
-        % subfolder so that PhenotypeBird doesn't run them
-        
-        % screeningday(filedir, savedir, birdname, day)
-        screeningday(filedir, savedir, birdname, 2)
+        subjs = {'bk62yw61'}; %, 'or7pu70'};
+
+        for i = 1:length(subjs)
+            birdname = subjs{i};
+            % sex = 'male';
+            % % 
+            % filedir = fullfile('Y:\public\screening', birdname);
+            % if isfolder(filedir)
+            %     cd(filedir)
+            %     WhispSegScreenDir(filedir, birdname, sex)
+            % end
+
+            filedir = fullfile('Y:\public\adult_screening\female', birdname);
+            if isfolder(filedir)
+                cd(filedir)
+                WhispSegScreenDir(filedir, birdname, sex)
+            end
+        end
         
         %% PhenotypeBird
+
+        % subjs = {'pk54bu44'};
+
+        for i = 1:length(subjs)
+            birdname = subjs{i};
+            %
+            % filedir = fullfile('Y:\public\screening\', birdname);
+            % if isfolder(filedir)
+            %     cd(filedir)
+            %     PhenotypeBird_lite(birdname)
+            % end
+
+            filedir = fullfile('Y:\public\adult_screening\female', birdname);
+            if isfolder(filedir)
+                fprintf('Adult\n')
+                cd(filedir)
+                PhenotypeBird_lite(birdname)
+            end
+        end
        
-        cd(savedir)
-        PhenotypeBird(birdname)
         
         %% PhenotypeBird each day
         
-        phenotype_by_day(filedir, birdname)
+        % subjs = {'yw51gr72'}; %, 'rd10pu97'};
+
+        for i = 1:length(subjs)
+            birdname = subjs{i};
+            filedir = fullfile('Y:\public\screening\', birdname);
+            phenotype_by_day(filedir, savedir, birdname, 'juv')
+        end
 
         %% Check on evsonganaly
 
@@ -50,7 +84,7 @@ subf = 'calls';
         % SnippetSubSampleDur: in s
         % sqf: square and filter songs (0: no, 1: yes)
         
-        CompareAllJamming(savedir, birdname, subf, 0.02, 1)
+        CompareAllJamming(savedir, birdname, subf, 0.02, 0)
         
         %% Compare channels for specific files
         % select individual .wav files (whichever channel for each block)
@@ -67,4 +101,5 @@ subf = 'calls';
         %% Check for missing/mislabeled calls
         
         evsonganaly
+                    
                     
