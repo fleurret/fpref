@@ -496,7 +496,7 @@ for f = 1:length(d)
         end
         
         %         audioout(:,5)=[pad; tempout(1:length(rawaudiochannel1)); pad];
-        audioout(:,5)=[tempout(1:length(rawaudiochannel1))];
+        % audioout(:,5)=[tempout(1:length(rawaudiochannel1))];
         
         tempout=zeros(length(rawaudiochannel1),1);
         for kk=1:length(jamonsets1)
@@ -504,7 +504,7 @@ for f = 1:length(d)
         end
         
         %         audioout(:,6)=[pad; tempout(1:length(rawaudiochannel1)); pad];
-        audioout(:,6)=[tempout(1:length(rawaudiochannel1))];
+        % audioout(:,6)=[tempout(1:length(rawaudiochannel1))];
         
         tempout=zeros(length(rawaudiochannel1),1);
         for kk=1:length(jamonsets2)
@@ -512,7 +512,7 @@ for f = 1:length(d)
         end
         
         %         audioout(:,7)=[pad; tempout(1:length(rawaudiochannel1)); pad];
-        audioout(:,7)=[tempout(1:length(rawaudiochannel1))];
+        % audioout(:,7)=[tempout(1:length(rawaudiochannel1))];
         
         NotMat1.onsets=sort((onsets1))/(fs/1000);
         NotMat1.offsets=sort((offsets1))/(fs/1000);
