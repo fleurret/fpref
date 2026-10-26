@@ -31,7 +31,7 @@ for i = 1:length(cages)
             'Color', [39,43,126]./255,...
             'LineWidth', 1.5)
     end
-   
+    
     title(append('Cage ', num2str(cages(i))))
     set(ax(i) ,'Layer', 'Top')
 end
@@ -64,7 +64,7 @@ for i = 1:length(cages)
         'Marker', 'none',...
         'Color', 'k',...
         'LineWidth', 1.5)
-
+    
     scatter(ax(i), cage.JuvKDE, 1:length(cage.JuvKDE),...
         'Marker', 'o',...
         'MarkerFaceColor', [189,191,245]./255,...
@@ -89,7 +89,7 @@ for i = 1:length(cages)
         xline(ax(i), am,...
             'Color', [39,43,126]./255)
     end
-
+    
     title(append('Cage ', num2str(cages(i))))
     set(ax(i) ,'Layer', 'Top')
     ylim([0 length(cage.JuvKDE)+1])
@@ -100,30 +100,35 @@ legend(ax(i),...
 legend(ax(i), 'boxoff')
 
 %%
-% d = readtable('Y:\Brainard\Analysis\Female preference\female_phenotypes.csv');
+d = readtable('Y:\Brainard\Analysis\Female preference\female_phenotypes.csv');
 
-cm = [234,175,59;... % or87yw46
-    188,188,188;... % wh26wh27
+cmlist = {'rd62bk49', 'or25rd67', 'or87yw46', 'yw51gr72',...
+    'wh37gr58', 'wh99pu92', 'wh26wh27'};
+cm = [75,14,33;...  rd62bk49
     201,55,55;... % or25rd67
+    234,175,59;... % or87yw46
+    197,230,86;... % yw51gr72
     108,164,134;... % wh37gr58
-    169,116,222]./255; % wh99pu92
+    169,116,222;... % wh99pu92
+    188,188,188]./255;% wh26wh27
 
 f = figure;
 f.Position = [0, 0, 500, 200];
-ax = gca; 
+ax = gca;
 hold on
 
-subjects = unique(d.Subject);
+subjects = cmlist;
 
 for i = 1:length(subjects)
     s = d(contains(d.Subject, subjects(i)),:);
     
+    match = find(strcmp(subjects(i), cmlist));
     plot([s.JuvDPH s.AdultDPH], [s.JuvKDE s.AdultKDE],...
         'Marker', 'o',...
-        'MarkerFaceColor', cm(i,:),...
+        'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
         'MarkerSize', 8,...
-        'Color', cm(i,:),...
+        'Color', cm(match,:),...
         'LineWidth', 1.5)
 end
 

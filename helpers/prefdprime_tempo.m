@@ -152,5 +152,61 @@ fprintf(' done\n')
 
 clear f
 
+
+% plot average
+f = figure;
+f.Position = [0, 0, 400, 250];
+ax = gca;
+hold on
+
+set(ax, 'TickDir', 'out',...
+    'XTickLabelRotation', 0,...
+    'TickLength', [0.02,0.02],...
+    'LineWidth', 1.5);
+set(findobj(ax,'-property','FontName'),...
+    'FontSize', 9,...
+    'FontName','Arial')
+
+X = 1:length(stimuli);
+Y = nan(1, length(stimuli));
+
+for i = 1:length(stimuli)
+    stimulusdata =  D(strcmp(D.StimNum, stimuli(i)),:);
+    otherdata = D(~strcmp(D.StimNum, stimuli(i)),:);
+    
+    a = stimulusdata.NormCalls;
+    b = otherdata.NormCalls;
+    
+    if isnan(calcd(a, b))
+        Y(i) = 0;
+    else
+        Y(i) = calcd(a, b);
+    end
+    
+    color = cm(strcmp(stims, unique(stimulusdata.Stimulus)), :);
+    scatter(X(i), Y(i),...
+        'Marker', 'o',...
+        'MarkerFaceColor', color,...
+        'MarkerEdgeColor', color,...
+        'SizeData', 75)
+end
+
+p = plot(X, Y,...
+    'Marker', 'none',...
+    'Color', 'k',...
+    'LineWidth', 1.5);
+uistack(p, 'bottom')
+
+xticks(1:length(stimuli))
+xticklabels(sessiondata.GapChange)
+xlim([0.5 length(stimuli)+0.5])
+ylim([ax.YLim(1)-0.5 ax.YLim(2)+0.5])
+ylabel(ax,'d''',...
+    'FontWeight', 'bold')
+set(ax, 'Layer', 'Top')
+
+sgtitle(birdname)
+
+
 function d = calcd(a, b)
 d = (2*(mean(a)-mean(b)))/(sqrt((std(a)^2) + (std(b)^2)));

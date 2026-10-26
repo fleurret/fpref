@@ -75,9 +75,8 @@ switch sv
             allfiles = dir(sd);
             allfiles = allfiles(~ismember({allfiles.name}, {'.','..'}));
             callfiles = allfiles(endsWith({allfiles.name}, '.not.mat'));
-            %             wavfiles = allfiles(endsWith({allfiles.name}, '.wav'));
-            
-            % create tables
+            wavfiles = allfiles(endsWith({allfiles.name}, '.wav'));
+
             % create tables
             blockdata = table('size',[length(callfiles) 13],...
                 'variabletypes',["string","string", "string","string","string","string","string",...
@@ -122,9 +121,6 @@ switch sv
                 if contains(bn{1}, 'Ch1')
                 end
                 
-                %                 wfn = append(fp, bn(1), '.wav');
-                %                 wav = wavfiles(contains({wavfiles.name}, wfn));
-                %                 [wf, fs] = audioread(fullfile(wav.folder, wav.name));
                 
                 % load mat data
                 data = load(fullfile(callfiles(j).folder, callfiles(j).name));
@@ -165,11 +161,17 @@ switch sv
                     
                     t = seconds(block_offset - block_onset);
                     
-                    % get timestamps from segmented wavs - more accurate
-                    %                     ch2seg = round(wf(:,5));
-                    %                     block_onset = duration(seconds(min(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
-                    %                     block_offset = duration(seconds(max(find(ch2seg == 1))/fs), 'format', 'hh:mm:ss.SSS');
-                    %                     t = seconds(block_offset - block_onset);
+                    if t == 0
+                        % bug - get timestamps from segmented wavs
+                        wfn = erase(callfiles(j).name, '.songs.not.mat');
+                        wav = wavfiles(contains({wavfiles.name}, wfn));
+                        [wf, fs] = audioread(fullfile(wav.folder, wav.name));
+                        
+                        ch2seg = round(wf(:,3));
+                        block_onset = duration(seconds(min(find(ch2seg == -1))/fs), 'format', 'hh:mm:ss.SSS');
+                        block_offset = duration(seconds(max(find(ch2seg == -1))/fs), 'format', 'hh:mm:ss.SSS');
+                        t = seconds(block_offset - block_onset);
+                    end 
                     
                     % remove preblock calls
                     onsets = sort(data.onsets);
@@ -193,10 +195,17 @@ switch sv
                     quarterblock = (block_offset - block_onset)/4;
                     q = block_onset:quarterblock:block_offset;
                     
-                    blockdata(j,:).Q1Pct = (sum(calls <= q(2) & calls > q(1))/length(calls))*100;
-                    blockdata(j,:).Q2Pct = (sum(calls <= q(3) & calls > q(2))/length(calls))*100;
-                    blockdata(j,:).Q3Pct = (sum(calls <= q(4) & calls > q(3))/length(calls))*100;
-                    blockdata(j,:).Q4Pct = (sum(calls <= q(5) & calls > q(4))/length(calls))*100;
+                    if ~isempty(calls)
+                        blockdata(j,:).Q1Pct = (sum(calls <= q(2) & calls > q(1))/length(calls))*100;
+                        blockdata(j,:).Q2Pct = (sum(calls <= q(3) & calls > q(2))/length(calls))*100;
+                        blockdata(j,:).Q3Pct = (sum(calls <= q(4) & calls > q(3))/length(calls))*100;
+                        blockdata(j,:).Q4Pct = (sum(calls <= q(5) & calls > q(4))/length(calls))*100;
+                    else
+                        blockdata(j,:).Q1Pct = NaN;
+                        blockdata(j,:).Q2Pct = NaN;
+                        blockdata(j,:).Q3Pct = NaN;
+                        blockdata(j,:).Q4Pct = NaN;
+                    end
                     
                     % add postblock calls to the right place
                     postblockcalls = length(call_onsets(call_onsets > block_offset));
