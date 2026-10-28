@@ -10,7 +10,7 @@ tiledlayout(2, 4,...
 D = readtable(fullfile(savedir, 'female_phenotypes.csv'));
 subjects = [D.Subject];
 
-vars = {'JuvKDE', 'AdultKDE', 'DadSongKDE', 'MomKDE'};
+vars = {'JuvKDE', 'AdultKDE', 'DadSongTempo', 'MomJuvKDE'};
 
 for j = 1:4
     xval = cell2mat(vars(j));

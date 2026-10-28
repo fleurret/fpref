@@ -163,7 +163,12 @@ for i = 1:length(sessions)
     
     for j = 1:length(stims)
         stimulusdata = sessiondata(contains(sessiondata.Stimulus, stims(j)),:);
-        Y(j,:) = flip(stimulusdata.NumCalls');
+        
+        if isempty(stimulusdata)
+            continue
+        else
+            Y(j,:) = flip(stimulusdata.NumCalls');
+        end
     end
     
     ax(i) = nexttile;
@@ -258,9 +263,9 @@ for i = 1:length(stims)
     block = stimulusdata(~contains(stimulusdata.BlockType, 'Post'),:);
     
     bcallpct(i) = sum(block.NumCalls)/height(block);
-    bsem(i) = std(block.NumCalls)/sqrt(height(block));
+    bsem(i) = std(block.NumCalls, 'omitnan')/sqrt(height(block));
     pbcallpct(i) = sum(postblock.NumCalls)/height(postblock);
-    pbsem(i) = std(postblock.NumCalls)/sqrt(height(postblock));
+    pbsem(i) = std(postblock.NumCalls, 'omitnan')/sqrt(height(postblock));
 end
 
 errorbar(ax(2), 1:length(stims), bcallpct, bsem,...

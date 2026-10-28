@@ -1,10 +1,4 @@
-function selectivity_corr(savedir)
-
-cm = [234,175,59;... % or87yw46
-    188,188,188;... % wh26wh27
-    201,55,55;... % or25rd67
-    108,164,134;... % wh37gr58
-    169,116,222]./255; % wh99pu92
+function selectivity_corr2(savedir, cmlist, cm)
 
 d = readtable(fullfile(savedir, 'female_phenotypes.csv'));
 subjects = [d.Subject];
@@ -12,57 +6,67 @@ si = nan(1, length(subjects));
 dprime = nan(1, length(subjects));
 
 % pref test
-% calculate selectivity and dprime
 for i = 1:length(subjects)
-    prefdata = readtable(cell2mat(fullfile(savedir, subjects(i), 'testing', append(subjects(i), '_calls.csv'))));
-    
-    % only blocks
-    D = prefdata(strcmp(prefdata.BlockType, 'Block'),:);
-    
-    sessions = sort(unique(D.Session));
-    stims = unique(D.Stimulus);
-    SI = [];
-    Dprime = [];
-    
-    for j = 1:length(sessions)
-        sessiondata = D(D.Session == sessions(j),:);
-        
-        % selectivity index
-        Ms = mean(sessiondata.NumCalls);
-        sems = std(sessiondata.NumCalls)/sqrt(height(sessiondata));
-        
-        Y1 = nan(1, length(stims));
-        Y2 = nan(1, length(stims));
-        
-        for k = 1:length(stims)
-            stimulusdata = sessiondata(contains(sessiondata.Stimulus, stims(k)),:);
-            otherstims = sessiondata(~contains(sessiondata.Stimulus, stims(k)),:);
-            
-            % selectivity index
-            if isnan(stimulusdata.NumCalls/Ms)
-                Y1(k) = 1;
-            else
-                Y1(k) = stimulusdata.NumCalls/Ms;
-            end
-            
-            % dprime
-            a = stimulusdata.NumCalls;
-            b = otherstims.NumCalls;
-            
-            if isnan(calcd(a, b))
-                Y2(k) = 0;
-            else
-                Y2(k) = calcd(a, b);
-            end
-            
-        end
-        
-        SI = [SI; Y1];
-        Dprime = [Dprime; Y2];
+    if isfile(fullfile(savedir, subjects(i), 'testing', append(subjects(i), '_calls.csv')))
+        prefdata = readtable(cell2mat(fullfile(savedir, subjects(i), 'testing', append(subjects(i), '_calls.csv'))));
+    elseif isfile(fullfile(savedir, subjects(i), 'pref_test', append(subjects(i), '_calls.csv')))
+        prefdata = readtable(cell2mat(fullfile(savedir, subjects(i), 'pref_test', append(subjects(i), '_calls.csv'))));
+    else
+        prefdata = [];
     end
     
-    si(i) = max(mean(SI));
-    dprime(i) = max(mean(Dprime));
+    if isempty(prefdata)
+        continue
+    else
+        % only blocks
+        D = prefdata(strcmp(prefdata.BlockType, 'Block'),:);
+        
+        sessions = sort(unique(D.Session));
+        stims = unique(D.Stimulus);
+        SI = [];
+        Dprime = [];
+        
+        for j = 1:length(sessions)
+            sessiondata = D(D.Session == sessions(j),:);
+            
+            % selectivity index
+            Ms = mean(sessiondata.NumCalls);
+            sems = std(sessiondata.NumCalls)/sqrt(height(sessiondata));
+            
+            Y1 = nan(1, length(stims));
+            Y2 = nan(1, length(stims));
+            
+            for k = 1:length(stims)
+                stimulusdata = sessiondata(contains(sessiondata.Stimulus, stims(k)),:);
+                otherstims = sessiondata(~contains(sessiondata.Stimulus, stims(k)),:);
+                
+                if ~isempty(stimulusdata)
+                    % selectivity index
+                    if isnan(stimulusdata.NumCalls/Ms)
+                        Y1(k) = 1;
+                    else
+                        Y1(k) = stimulusdata.NumCalls/Ms;
+                    end
+                    
+                    % dprime
+                    a = stimulusdata.NumCalls;
+                    b = otherstims.NumCalls;
+                    
+                    if isnan(calcd(a, b))
+                        Y2(k) = 0;
+                    else
+                        Y2(k) = calcd(a, b);
+                    end
+                end
+            end
+            
+            SI = [SI; Y1];
+            Dprime = [Dprime; Y2];
+        end
+        
+        si(i) = max(mean(SI));
+        dprime(i) = max(mean(Dprime));
+    end
 end
 
 f = figure;
@@ -77,9 +81,10 @@ hold on
 
 for i = 1:length(subjects)
     bird = d(i,:);
+    match = find(strcmp(subjects(i), cmlist));
     scatter(ax(1), bird.JuvKDE, si(i),...
         'Marker', 'o',...
-        'MarkerFaceColor', cm(i,:),...
+        'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
         'MarkerFaceAlpha', 1,...
         'SizeData', 80)
@@ -120,16 +125,17 @@ if length(R) > 1
 end
 
 xlabel(ax(1), 'Juvenile KDE (calls/sec)')
-ylabel(ax(1), 'Maximum avg SI')
+ylabel(ax(1), 'Max SI')
 
 ax(2) = nexttile;
 hold on
 
 for i = 1:length(subjects)
     bird = d(i,:);
+    match = find(strcmp(subjects(i), cmlist));
     scatter(ax(2), bird.AdultKDE, si(i),...
         'Marker', 'o',...
-        'MarkerFaceColor', cm(i,:),...
+        'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
         'MarkerFaceAlpha', 1,...
         'SizeData', 80)
@@ -166,7 +172,7 @@ if length(R) > 1
 end
 
 xlabel(ax(2), 'Adult KDE (calls/sec)')
-ylabel(ax(2), 'Maximum avg SI')
+ylabel(ax(2), 'Max SI')
 
 linkaxes(ax(1:2), 'xy')
 
@@ -175,9 +181,10 @@ hold on
 
 for i = 1:length(subjects)
     bird = d(i,:);
+    match = find(strcmp(subjects(i), cmlist));
     scatter(ax(3), bird.JuvKDE, dprime(i),...
         'Marker', 'o',...
-        'MarkerFaceColor', cm(i,:),...
+        'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
         'MarkerFaceAlpha', 1,...
         'SizeData', 80)
@@ -214,16 +221,17 @@ if length(R) > 1
 end
 
 xlabel(ax(3), 'Juvenile KDE (calls/sec)')
-ylabel(ax(3), 'Maximum avg dprime')
+ylabel(ax(3), 'Max dprime')
 
 ax(4) = nexttile;
 hold on
 
 for i = 1:length(subjects)
     bird = d(i,:);
+    match = find(strcmp(subjects(i), cmlist));
     scatter(ax(4), bird.AdultKDE, dprime(i),...
         'Marker', 'o',...
-        'MarkerFaceColor', cm(i,:),...
+        'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
         'MarkerFaceAlpha', 1,...
         'SizeData', 80)
@@ -260,7 +268,7 @@ if length(R) > 1
 end
 
 xlabel(ax(4), 'Adult KDE (calls/sec)')
-ylabel(ax(4), 'Maximum avg dprime')
+ylabel(ax(4), 'Max dprime')
 
 linkaxes(ax(3:4), 'xy')
 
@@ -312,9 +320,9 @@ for i = 1:length(subjects)
     for j = 1:length(sessions)
         sessiondata = D(D.Session == sessions(j),:);
         sessiondata = sortrows(sessiondata, ["Stimulus", "GapChange"], 'descend');
-    
+        
         stimuli = unique(sessiondata.StimNum, 'stable');
-    
+        
         % selectivity index
         Ms = mean(sessiondata.NormCalls);
         Y1 = nan(1, length(stimuli));
@@ -347,9 +355,10 @@ for i = 1:length(subjects)
         Dprime = [Dprime; Y2];
     end
     
-    si(i) = max(mean(SI));
-    dprime(i) = max(mean(Dprime));
+    si(i) = max(mean(SI, 'omitnan'));
+    dprime(i) = max(mean(Dprime, 'omitnan'));
 end
+
 
 f = figure;
 f.Position = [0, 0, 600, 600];
@@ -363,9 +372,10 @@ hold on
 
 for i = 1:length(subjects)
     bird = d(i,:);
+    match = find(strcmp(subjects(i), cmlist));
     scatter(ax(1), bird.JuvKDE, si(i),...
         'Marker', 'o',...
-        'MarkerFaceColor', cm(i,:),...
+        'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
         'MarkerFaceAlpha', 1,...
         'SizeData', 80)
@@ -406,16 +416,17 @@ if length(R) > 1
 end
 
 xlabel(ax(1), 'Juvenile KDE (calls/sec)')
-ylabel(ax(1), 'Maximum avg SI')
+ylabel(ax(1), 'Max SI')
 
 ax(2) = nexttile;
 hold on
 
 for i = 1:length(subjects)
     bird = d(i,:);
+    match = find(strcmp(subjects(i), cmlist));
     scatter(ax(2), bird.AdultKDE, si(i),...
         'Marker', 'o',...
-        'MarkerFaceColor', cm(i,:),...
+        'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
         'MarkerFaceAlpha', 1,...
         'SizeData', 80)
@@ -452,7 +463,7 @@ if length(R) > 1
 end
 
 xlabel(ax(2), 'Adult KDE (calls/sec)')
-ylabel(ax(2), 'Maximum avg SI')
+ylabel(ax(2), 'Max SI')
 
 linkaxes(ax(1:2), 'xy')
 
@@ -461,9 +472,10 @@ hold on
 
 for i = 1:length(subjects)
     bird = d(i,:);
+    match = find(strcmp(subjects(i), cmlist));
     scatter(ax(3), bird.JuvKDE, dprime(i),...
         'Marker', 'o',...
-        'MarkerFaceColor', cm(i,:),...
+        'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
         'MarkerFaceAlpha', 1,...
         'SizeData', 80)
@@ -500,16 +512,17 @@ if length(R) > 1
 end
 
 xlabel(ax(3), 'Juvenile KDE (calls/sec)')
-ylabel(ax(3), 'Maximum avg dprime')
+ylabel(ax(3), 'Max dprime')
 
 ax(4) = nexttile;
 hold on
 
 for i = 1:length(subjects)
     bird = d(i,:);
+    match = find(strcmp(subjects(i), cmlist));
     scatter(ax(4), bird.AdultKDE, dprime(i),...
         'Marker', 'o',...
-        'MarkerFaceColor', cm(i,:),...
+        'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
         'MarkerFaceAlpha', 1,...
         'SizeData', 80)
@@ -546,7 +559,7 @@ if length(R) > 1
 end
 
 xlabel(ax(4), 'Adult KDE (calls/sec)')
-ylabel(ax(4), 'Maximum avg dprime')
+ylabel(ax(4), 'Max dprime')
 
 linkaxes(ax(3:4), 'xy')
 

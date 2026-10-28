@@ -29,13 +29,15 @@ for i = 1:length(sessions)
         stimulusdata = sessiondata(contains(sessiondata.Stimulus, stims(j)),:);
         otherstims = sessiondata(~contains(sessiondata.Stimulus, stims(j)),:);
         
-        a = stimulusdata.NumCalls;
-        b = otherstims.NumCalls;
-        
-        if isnan(calcd(a, b))
-            Y(j) = 0;
-        else
-            Y(j) = calcd(a, b);
+        if ~isempty(stimulusdata)
+            a = stimulusdata.NumCalls;
+            b = otherstims.NumCalls;
+            
+            if isnan(calcd(a, b))
+                Y(j) = 0;
+            else
+                Y(j) = calcd(a, b);
+            end
         end
     end
     
@@ -94,8 +96,8 @@ set(findobj(ax,'-property','FontName'),...
     'FontName','Arial')
 
 X = 1:length(stims);
-Y = mean(allY);
-sem = std(allY)/sqrt(height(allY));
+Y = mean(allY, 'omitnan');
+sem = std(allY, 'omitnan')/sqrt(height(allY));
 
 errorbar(X, Y, sem,...
     'Marker', 'o',...
@@ -120,7 +122,7 @@ fprintf('Saving %s ...', fn)
 exportgraphics(f, fn,...
     'ContentType', 'vector')
 
-printf(' done\n')
+fprintf(' done\n')
 
 clear f
 
