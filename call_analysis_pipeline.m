@@ -1,6 +1,6 @@
 %% SET VARIABLES
 
-birdname = 'bu95bu15';
+birdname = 'rd68rd95';
     %'wh26wh27'; %'or25rd67'; %'yw51gr72'; %'wh37gr58' 'or87yw46'; 'wh99pu92'
 savedir = 'Y:\Brainard\Analysis\Female preference';
 subf = 'pref_test';
@@ -84,16 +84,16 @@ subf = 'pref_test';
 
 cmlist = {'rd76bk40', 'rd68rd95', 'or25rd67', 'or87yw46', 'yw51gr72',...
     'wh37gr58', 'bu95bu15', 'wh99pu92', 'wh26wh27'};
-cm = [75,14,33;... % rd62bk49
-    222,47,47;... % rd68rd95
-    201,55,55;... % or25rd67
-    234,175,59;... % or87yw46
+cm = [96,9,9;... % rd62bk49
+    155,13,13;... % rd68rd95
+    221,93,54;... % or25rd67
+    242,205,59;... % or87yw46
     197,230,86;... % yw51gr72
     108,164,134;... % wh37gr58
     75,184,214;... % bu95bu15
     169,116,222;... % wh99pu92
     188,188,188]./255; % wh26wh27
-savedir = 'X:\Brainard\Analysis\Female preference';
+savedir = 'Y:\Brainard\Analysis\Female preference';
         
         %% Tempo phenotype v preferred stimulus tempo
         % plots correlation between call tempo/preferred tempo across birds
@@ -102,4 +102,4 @@ savedir = 'X:\Brainard\Analysis\Female preference';
 
         %% Tempo phenotype v stimulus selectivity
         
-        selectivity_corr2(savedir, cmlist, cm)
+        selectivity_corr(savedir, cmlist, cm)

@@ -1,6 +1,10 @@
-function selectivity_corr2(savedir, cmlist, cm)
+function selectivity_corr(savedir, cmlist, cm)
 
 d = readtable(fullfile(savedir, 'female_phenotypes.csv'));
+[~, n] = ismember(d.Subject, cmlist);
+[~, ii] = sortrows(n, 1);
+d = d(ii,:);
+
 subjects = [d.Subject];
 si = nan(1, length(subjects));
 dprime = nan(1, length(subjects));

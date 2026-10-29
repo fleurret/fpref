@@ -8,6 +8,9 @@ tiledlayout(2, 4,...
     'TileSpacing', 'compact');
 
 D = readtable(fullfile(savedir, 'female_phenotypes.csv'));
+[~, n] = ismember(D.Subject, cmlist);
+[~, ii] = sortrows(n, 1);
+D = D(ii,:);
 subjects = [D.Subject];
 
 vars = {'JuvKDE', 'AdultKDE', 'DadSongTempo', 'MomJuvKDE'};
