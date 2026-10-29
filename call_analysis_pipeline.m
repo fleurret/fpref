@@ -1,15 +1,17 @@
 %% SET VARIABLES
 
-birdname = 'or25rd67';
-    %'wh26wh27'; %'or25rd67'; %'rd47yw4'; %'wh37gr58' 'or87yw46'
-savedir = 'X:\Brainard\Analysis\Female preference';
-subf = 'tempo_test';
-
+birdname = 'bu95bu15';
+    %'wh26wh27'; %'or25rd67'; %'yw51gr72'; %'wh37gr58' 'or87yw46'; 'wh99pu92'
+savedir = 'Y:\Brainard\Analysis\Female preference';
+subf = 'pref_test';
 
 %% EVSONGANALY
         sf = uigetdir(fullfile(savedir, birdname, subf));
         cd(sf)
+        
         evsonganaly
+%%        
+        refilterch(savedir, birdname, subf)
         
 %% CONCATENATE DATA FOR R
 
@@ -18,7 +20,7 @@ subf = 'tempo_test';
         % concat_data(savedir, type)
         % type: 'testing', 'pref_retest', 'tempo_test'
         
-        concat_data(savedir, 'testing')
+        concat_data(savedir, 'pref_test')
 
 %% ANALYSIS -- STIMULUS PREFERENCE
         
@@ -77,5 +79,27 @@ subf = 'tempo_test';
         % calculates and plots d' for each session/average across sessions
         
         prefdprime_tempo(savedir, birdname)
-
         
+%% GROUP LEVEL ANALYSIS
+
+cmlist = {'rd76bk40', 'rd68rd95', 'or25rd67', 'or87yw46', 'yw51gr72',...
+    'wh37gr58', 'bu95bu15', 'wh99pu92', 'wh26wh27'};
+cm = [75,14,33;... % rd62bk49
+    222,47,47;... % rd68rd95
+    201,55,55;... % or25rd67
+    234,175,59;... % or87yw46
+    197,230,86;... % yw51gr72
+    108,164,134;... % wh37gr58
+    75,184,214;... % bu95bu15
+    169,116,222;... % wh99pu92
+    188,188,188]./255; % wh26wh27
+savedir = 'X:\Brainard\Analysis\Female preference';
+        
+        %% Tempo phenotype v preferred stimulus tempo
+        % plots correlation between call tempo/preferred tempo across birds
+        
+        tempo_corr(savedir, cmlist, cm)
+
+        %% Tempo phenotype v stimulus selectivity
+        
+        selectivity_corr2(savedir, cmlist, cm)

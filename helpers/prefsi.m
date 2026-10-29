@@ -23,18 +23,20 @@ allY = [];
 
 for i = 1:length(sessions)
     sessiondata = D(D.Session == sessions(i),:);
-    Ms = mean(sessiondata.NumCalls);
-    sems = std(sessiondata.NumCalls)/sqrt(height(sessiondata));
+    Ms = mean(sessiondata.NumCalls, 'omitnan');
+    sems = std(sessiondata.NumCalls, 'omitnan')/sqrt(height(sessiondata));
     
     Y = nan(1, length(stims));
     
     for j = 1:length(stims)
         stimulusdata = sessiondata(contains(sessiondata.Stimulus, stims(j)),:);
         
-        if isnan(stimulusdata.NumCalls/Ms)
-            Y(j) = 1;
-        else
-            Y(j) = stimulusdata.NumCalls/Ms;
+        if ~isempty(stimulusdata)
+            if isnan(stimulusdata.NumCalls/Ms)
+                Y(j) = 1;
+            else
+                Y(j) = stimulusdata.NumCalls/Ms;
+            end
         end
         
     end
@@ -95,8 +97,8 @@ set(findobj(ax,'-property','FontName'),...
     'FontName','Arial')
 
 X = 1:length(stims);
-Y = mean(allY);
-sem = std(allY)/sqrt(height(allY));
+Y = mean(allY, 'omitnan');
+sem = std(allY, 'omitnan')/sqrt(height(allY));
 
 errorbar(X, Y, sem,...
     'Marker', 'o',...
