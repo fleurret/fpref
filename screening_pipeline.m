@@ -1,6 +1,6 @@
 %% SET VARIABLES
-subjs = {'bk12wh43', 'rd34rd61', 'or6pu10', 'gr22bu12', 'or7pu10', 'pu7bk39', 'bu85bu97'};
-sex = 'male';
+subjs = {'or29or76'};
+sex = 'female';
 
 jdir = 'Y:\public\screening'; % juvenile screening data folder
 jsavedir = 'Y:\public\Juvenile_Call_Phenotyping'; % juvenile screening output folder

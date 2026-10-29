@@ -99,18 +99,6 @@ for f = 1:length(d)
             [audiochannel2 fs2]=audioread(wavfile2);
         end
         
-        % is there a delay?
-        [sims, lags] = xcorr(audiochannel1, audiochannel2);
-        [~, idx] = max(abs(sims));
-        delay = lags(idx);
-        
-        if delay > 0
-            audiochannel2 = [zeros(delay, 1); audiochannel2(1:end-delay)];
-        elseif delay < 0
-            delay = abs(delay);
-            audiochannel2 = [audiochannel2(delay+1:end); zeros(delay,1)];
-        end
-        
         pad=zeros(3*fs,1); % ?? why
         rawaudiochannel2=bandpass(audiochannel2, [300 10000], fs);
         rawaudiochannel1=bandpass(audiochannel1, [300 10000], fs2);
@@ -127,6 +115,19 @@ for f = 1:length(d)
         
         h   = ones(1,len)/len;
         %h=gausswin(len);
+
+
+        % is there a delay?
+        [sims, lags] = xcorr(audiochannel1, audiochannel2);
+        [~, idx] = max(abs(sims));
+        delay = lags(idx);
+        
+        if delay > 0
+            audiochannel2 = [zeros(delay, 1); audiochannel2(1:end-delay)];
+        elseif delay < 0
+            delay = abs(delay);
+            audiochannel2 = [audiochannel2(delay+1:end); zeros(delay,1)];
+        end
         
         % Square + Filter songs.
         if sqf == 1
