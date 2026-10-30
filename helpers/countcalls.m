@@ -100,6 +100,17 @@ switch sv
                     block_onset = timestamps.timestamp_HH_MM_SS_mmm_(brow+1) - timestamps.timestamp_HH_MM_SS_mmm_(brow);
                     block_offset = timestamps.timestamp_HH_MM_SS_mmm_(brow+2) - timestamps.timestamp_HH_MM_SS_mmm_(brow);
                     
+                    % weird bug idk
+                    if isnan(block_offset)
+                        [wf, fs] = audioread(fullfile(callfiles(j).folder, data.fname));
+                        ch2seg = round(wf(:,3));
+
+                        % find last offset
+                        minmask = ch2seg(fs*65:fs*67,:);
+                        block_offset = duration(seconds(max(find(minmask == -1))/fs + 65), 'format', 'hh:mm:ss.SSS');
+                        fprintf('BUG ALERT!\n')
+                    end
+                    
                     % remove preblock calls
                     onsets = sort(data.onsets);
                     call_onsets = duration(seconds(onsets/1000), 'format', 'hh:mm:ss.SSS');

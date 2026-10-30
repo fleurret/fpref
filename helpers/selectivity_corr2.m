@@ -69,7 +69,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(1), bird.JuvKDE, si(i),...
+    scatter(ax(1), bird.JuvMed, si(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -81,7 +81,7 @@ legend(ax(1), subjects,...
     'AutoUpdate', 'off');
 legend('boxoff')
 
-xf = d.JuvKDE;
+xf = d.JuvMed;
 yf = si;
 
 if any(isnan(yf))
@@ -111,7 +111,7 @@ if length(R) > 1
         'HorizontalAlignment', 'right');
 end
 
-xlabel(ax(1), 'Juvenile KDE (calls/sec)')
+xlabel(ax(1), 'Juvenile Med (calls/sec)')
 ylabel(ax(1), 'Max SI')
 
 ax(2) = nexttile;
@@ -120,7 +120,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(2), bird.AdultKDE, si(i),...
+    scatter(ax(2), bird.AdultMed, si(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -128,7 +128,7 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = d.AdultKDE;
+xf = d.AdultMed;
 yf = si;
 
 if any(isnan(yf))
@@ -158,7 +158,7 @@ if length(R) > 1
         'HorizontalAlignment', 'right');
 end
 
-xlabel(ax(2), 'Adult KDE (calls/sec)')
+xlabel(ax(2), 'Adult Med (calls/sec)')
 ylabel(ax(2), 'Max SI')
 
 linkaxes(ax(1:2), 'xy')
@@ -169,7 +169,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(3), bird.JuvKDE, dprime(i),...
+    scatter(ax(3), bird.JuvMed, dprime(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -177,7 +177,7 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = d.JuvKDE;
+xf = d.JuvMed;
 yf = dprime;
 
 if any(isnan(yf))
@@ -207,7 +207,7 @@ if length(R) > 1
         'HorizontalAlignment', 'right');
 end
 
-xlabel(ax(3), 'Juvenile KDE (calls/sec)')
+xlabel(ax(3), 'Juvenile Med (calls/sec)')
 ylabel(ax(3), 'Max dprime')
 
 ax(4) = nexttile;
@@ -216,7 +216,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(4), bird.AdultKDE, dprime(i),...
+    scatter(ax(4), bird.AdultMed, dprime(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -224,7 +224,7 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = d.AdultKDE;
+xf = d.AdultMed;
 yf = dprime;
 
 if any(isnan(yf))
@@ -254,7 +254,7 @@ if length(R) > 1
         'HorizontalAlignment', 'right');
 end
 
-xlabel(ax(4), 'Adult KDE (calls/sec)')
+xlabel(ax(4), 'Adult Med (calls/sec)')
 ylabel(ax(4), 'Max dprime')
 
 linkaxes(ax(3:4), 'xy')
@@ -347,7 +347,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(1), bird.JuvKDE, si(i),...
+    scatter(ax(1), bird.JuvMed, si(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -359,7 +359,7 @@ legend(ax(1), subjects,...
     'AutoUpdate', 'off');
 legend('boxoff')
 
-xf = d.JuvKDE;
+xf = d.JuvMed;
 yf = si;
 
 if any(isnan(yf))
@@ -389,7 +389,7 @@ if length(R) > 1
         'HorizontalAlignment', 'right');
 end
 
-xlabel(ax(1), 'Juvenile KDE (calls/sec)')
+xlabel(ax(1), 'Juvenile Med (calls/sec)')
 ylabel(ax(1), 'Max SI')
 
 ax(2) = nexttile;
@@ -398,7 +398,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(2), bird.AdultKDE, si(i),...
+    scatter(ax(2), bird.AdultMed, si(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -406,7 +406,7 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = d.AdultKDE;
+xf = d.AdultMed;
 yf = si;
 
 if any(isnan(yf))
@@ -436,7 +436,7 @@ if length(R) > 1
         'HorizontalAlignment', 'right');
 end
 
-xlabel(ax(2), 'Adult KDE (calls/sec)')
+xlabel(ax(2), 'Adult Med (calls/sec)')
 ylabel(ax(2), 'Max SI')
 
 linkaxes(ax(1:2), 'xy')
@@ -447,7 +447,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(3), bird.JuvKDE, dprime(i),...
+    scatter(ax(3), bird.JuvMed, dprime(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -455,7 +455,7 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = d.JuvKDE;
+xf = d.JuvMed;
 yf = dprime;
 
 if any(isnan(yf))
@@ -485,7 +485,7 @@ if length(R) > 1
         'HorizontalAlignment', 'right');
 end
 
-xlabel(ax(3), 'Juvenile KDE (calls/sec)')
+xlabel(ax(3), 'Juvenile Med (calls/sec)')
 ylabel(ax(3), 'Maximum dprime')
 
 ax(4) = nexttile;
@@ -494,7 +494,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(4), bird.AdultKDE, dprime(i),...
+    scatter(ax(4), bird.AdultMed, dprime(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -502,7 +502,7 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = d.AdultKDE;
+xf = d.AdultMed;
 yf = dprime;
 
 if any(isnan(yf))
@@ -532,7 +532,7 @@ if length(R) > 1
         'HorizontalAlignment', 'right');
 end
 
-xlabel(ax(4), 'Adult KDE (calls/sec)')
+xlabel(ax(4), 'Adult Med (calls/sec)')
 ylabel(ax(4), 'Maximum dprime')
 
 linkaxes(ax(3:4), 'xy')
