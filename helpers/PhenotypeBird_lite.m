@@ -88,7 +88,7 @@ else
         % xlabel('Time (ms)');
         % ylabel('Density (a.u.)');
         % title("KDE:"+(d(idx)/1000)+" FiltKDE(r):"+peakTimeMs+"   Median:"+output(i).callratemedian +"  HalfWidth: "+halfMaxWidthMs);
-        % grid on;
+        % % grid on;
         %            exportgraphics(gcf,"./Figs/"+string(birdname) + 'KDE.png','Resolution',300)
         %           close(gcf)
 
@@ -117,28 +117,38 @@ else
 end
 
 % plot hist
-% F = figure;
-% F.Position = [0, 0, 500, 300];
-% ax = gca;
-% cm = [69,129,92]./255;
-% 
-% set(ax, 'TickDir', 'out',...
-%     'XTickLabelRotation', 0,...
-%     'TickLength', [0.02,0.02],...
-%     'LineWidth', 1.5);
-% set(findobj(ax,'-property','FontName'),...
-%     'FontSize', 9,...
-%     'FontName','Arial')
-% 
-% histogram(output.callmotifdurs/1000, 100,...
-%     'FaceColor', cm,...
-%     'EdgeColor', 'none')
-% 
-% title(birdname)
-% xlabel(ax, 'Call ITI (s)',...
-%     'FontWeight', 'bold')
-% ylabel(ax,'Frequency',...
-%     'FontWeight', 'bold')
-% set(ax,'Layer', 'Top')
+F = figure;
+F.Position = [0, 0, 500, 300];
+ax = gca;
+hold on
+cm = [69,129,92]./255;
+
+[c d]=ksdensity(output.callmotifdurs,'Bandwidth',50);
+[~,idx]=max(c);
+d = d/1000;
+
+set(ax, 'TickDir', 'out',...
+    'XTickLabelRotation', 0,...
+    'TickLength', [0.02,0.02],...
+    'LineWidth', 1.5);
+set(findobj(ax,'-property','FontName'),...
+    'FontSize', 9,...
+    'FontName','Arial')
+plot(d, (c./max(c))*max(histcounts(output.callmotifdurs, 50)),...
+    'LineWidth', 1.5,...
+    'Color','k');
+histogram(output.callmotifdurs/1000, 50,...
+    'FaceColor', cm,...
+    'EdgeColor', 'none')
+xline(1/d(idx),...
+    'LineStyle', '--')
+
+title(birdname)
+xlim([0 4])
+xlabel(ax, 'ICI (s)',...
+    'FontWeight', 'bold')
+ylabel(ax,'Frequency',...
+    'FontWeight', 'bold')
+set(ax,'Layer', 'Top')
 
 % ---------------------------------------------%
