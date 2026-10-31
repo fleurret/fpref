@@ -107,6 +107,12 @@ if any(isnan(yf))
     yf = yf(r);
 end
 
+if any(isnan(xf))
+    r = ~isnan(xf);
+    yf = yf(r);
+    xf = xf(r);
+end
+
 coefficients1 = polyfit(xf, yf, 1);
 xFit1 = linspace(min(xf), max(xf), 1000);
 yFit1 = polyval(coefficients1, xFit1);
@@ -137,7 +143,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(2), bird.AdultKDE, si(i),...
+    scatter(ax(2), bird.AdultKDE1, si(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -145,13 +151,19 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = d.AdultKDE;
+xf = d.AdultKDE1;
 yf = si;
 
 if any(isnan(yf))
     r = ~isnan(yf);
     xf = xf(r);
     yf = yf(r);
+end
+
+if any(isnan(xf))
+    r = ~isnan(xf);
+    yf = yf(r);
+    xf = xf(r);
 end
 
 coefficients2 = polyfit(xf, yf, 1);
@@ -203,6 +215,12 @@ if any(isnan(yf))
     yf = yf(r);
 end
 
+if any(isnan(xf))
+    r = ~isnan(xf);
+    yf = yf(r);
+    xf = xf(r);
+end
+
 coefficients1 = polyfit(xf, yf, 1);
 xFit1 = linspace(min(xf), max(xf), 1000);
 yFit1 = polyval(coefficients1, xFit1);
@@ -233,7 +251,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(4), bird.AdultKDE, dprime(i),...
+    scatter(ax(4), bird.AdultKDE1, dprime(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -241,13 +259,19 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = d.AdultKDE;
+xf = d.AdultKDE1;
 yf = dprime;
 
 if any(isnan(yf))
     r = ~isnan(yf);
     xf = xf(r);
     yf = yf(r);
+end
+
+if any(isnan(xf))
+    r = ~isnan(xf);
+    yf = yf(r);
+    xf = xf(r);
 end
 
 coefficients2 = polyfit(xf, yf, 1);
@@ -398,6 +422,12 @@ if any(isnan(yf))
     yf = yf(r);
 end
 
+if any(isnan(xf))
+    r = ~isnan(xf);
+    yf = yf(r);
+    xf = xf(r);
+end
+
 coefficients1 = polyfit(xf, yf, 1);
 xFit1 = linspace(min(xf), max(xf), 1000);
 yFit1 = polyval(coefficients1, xFit1);
@@ -428,7 +458,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(2), bird.AdultKDE, si(i),...
+    scatter(ax(2), bird.AdultKDE2, si(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -436,13 +466,19 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = d.AdultKDE;
+xf = d.AdultKDE2;
 yf = si;
 
 if any(isnan(yf))
     r = ~isnan(yf);
     xf = xf(r);
     yf = yf(r);
+end
+
+if any(isnan(xf))
+    r = ~isnan(xf);
+    yf = yf(r);
+    xf = xf(r);
 end
 
 coefficients2 = polyfit(xf, yf, 1);
@@ -494,6 +530,12 @@ if any(isnan(yf))
     yf = yf(r);
 end
 
+if any(isnan(xf))
+    r = ~isnan(xf);
+    yf = yf(r);
+    xf = xf(r);
+end
+
 coefficients1 = polyfit(xf, yf, 1);
 xFit1 = linspace(min(xf), max(xf), 1000);
 yFit1 = polyval(coefficients1, xFit1);
@@ -524,7 +566,7 @@ hold on
 for i = 1:length(subjects)
     bird = d(i,:);
     match = find(strcmp(subjects(i), cmlist));
-    scatter(ax(4), bird.AdultKDE, dprime(i),...
+    scatter(ax(4), bird.AdultKDE2, dprime(i),...
         'Marker', 'o',...
         'MarkerFaceColor', cm(match,:),...
         'MarkerEdgeColor', 'none',...
@@ -532,13 +574,19 @@ for i = 1:length(subjects)
         'SizeData', 80)
 end
 
-xf = d.AdultKDE;
+xf = d.AdultKDE2;
 yf = dprime;
 
 if any(isnan(yf))
     r = ~isnan(yf);
     xf = xf(r);
     yf = yf(r);
+end
+
+if any(isnan(xf))
+    r = ~isnan(xf);
+    yf = yf(r);
+    xf = xf(r);
 end
 
 coefficients2 = polyfit(xf, yf, 1);

@@ -13,7 +13,7 @@ D = readtable(fullfile(savedir, 'female_phenotypes.csv'));
 D = D(ii,:);
 subjects = [D.Subject];
 
-vars = {'JuvKDE', 'AdultKDE', 'DadSongTempo', 'MomJuvKDE'};
+vars = {'JuvKDE', 'AdultKDE2', 'DadSongTempo', 'MomJuvKDE'};
 
 for j = 1:4
     xval = cell2mat(vars(j));
@@ -42,6 +42,12 @@ for j = 1:4
         r = ~isnan(yf);
         xf = xf(r);
         yf = yf(r);
+    end
+    
+    if any(isnan(xf))
+        r = ~isnan(xf);
+        yf = yf(r);
+        xf = xf(r);
     end
     
     coefficients = polyfit(xf, yf, 1);
@@ -92,6 +98,12 @@ for j = 5:8
         r = ~isnan(yf);
         xf = xf(r);
         yf = yf(r);
+    end
+    
+    if any(isnan(xf))
+        r = ~isnan(xf);
+        yf = yf(r);
+        xf = xf(r);
     end
     
     coefficients = polyfit(xf, yf, 1);
