@@ -1,12 +1,12 @@
-function whisperseg_wrapper(subjs, sex, datadirs)
+function whisperseg_wrapper(subjs, sex, datadirs, callfilen, songfilen)
 
 for i = 1:length(subjs)
     birdname = subjs{i};
 
-    switch sex
-        case 'male'
-            datadirs = {datadirs{2,1}, datadirs{2,2}}; % ignore juvenile
-    end
+    % switch sex
+    %     case 'male'
+    %         datadirs = {datadirs{2,1}, datadirs{2,2}}; % ignore juvenile
+    % end
 
     for j = 1:height(datadirs)
         filedir = fullfile(datadirs{j,1}, birdname);
@@ -23,7 +23,12 @@ for i = 1:length(subjs)
                     % code an override later for if you want to rerun
                 else
                     cd(fullfile(screenings(k).folder, screenings(k).name))
-                    WhispSegScreenDir(cd, birdname, sex)
+                    WhispSegScreenDir(cd, birdname, sex, 'maxcallfiles', callfilen, 'maxsongfiles', songfilen)
+
+                    if ~exist(savedir)
+                        mkdir(savedir)
+                    end
+                    
                     movefile(fullfile(screenings(k).folder, screenings(k).name, birdname), fullfile(savedir, screenings(k).name))
                 end
             end

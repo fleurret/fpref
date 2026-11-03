@@ -1,6 +1,8 @@
 %% SET VARIABLES
-subjs = {'or29or76'};
-sex = 'female';
+subjs = {'pk46bu17'};
+sex = 'male';
+callfilen = 500;
+songfilen = 250;
 
 jdir = 'Y:\public\screening'; % juvenile screening data folder
 jsavedir = 'Y:\public\Juvenile_Call_Phenotyping'; % juvenile screening output folder
@@ -11,7 +13,7 @@ datadirs = {jdir, jsavedir; adir, asavedir};
 
         %% WhisperSeg
 
-        whisperseg_wrapper(subjs, sex, datadirs)
+        whisperseg_wrapper(subjs, sex, datadirs, callfilen, songfilen)
         
         %% PhenotypeBird
 
