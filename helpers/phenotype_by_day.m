@@ -4,13 +4,13 @@ f = uigetdir(filedir);
 cd(f)
 
 % WhispSegScreenDir(f, birdname, 'female')
-
-if ~isfolder(fullfile(f, birdname, 'calls'))
-    WhispSegScreenDir(f, birdname, 'female')
-end
+% 
+% if ~isfolder(fullfile(f, birdname, 'calls'))
+%     WhispSegScreenDir(f, birdname, 'female')
+% end
 
 % sort into folders
-d = dir(fullfile(f, birdname, 'calls'));
+d = dir(fullfile(f, 'calls'));
 d = d(~ismember({d.name},{'.','..','.DS_Store'}));
 allfiles = sort({d.name});
 allfiles = erase(allfiles, append(birdname, '_'));
@@ -60,9 +60,9 @@ sem = nan(1, length(mats));
 for i = 1:length(mats)
     load(fullfile(mats(i).folder, mats(i).name))
 
-    kde(i) = output.callkde;
-    med(i) = output.callmedian;
-    M(i) = output.callfilemean;
+    kde(i) = output.callratekde;
+    med(i) = output.callratemedian;
+    M(i) = output.callratefilemean;
     sem(i) = output.callfilestd/sqrt(length(output.callfiletimes));
 
     ax(i) = nexttile;
