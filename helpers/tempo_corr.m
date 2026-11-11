@@ -131,7 +131,7 @@ for j = 5:8
     title('Least preferred stimulus')
 end
 
-xlim(ax([3 7]), [6 8.5])
+xlim(ax([3 7]), [6 10])
 ylim(ax, ([3 15]))
 
 linkaxes(ax([3 7]), 'xy')
