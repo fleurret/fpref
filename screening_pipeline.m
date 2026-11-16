@@ -33,6 +33,9 @@ datadirs = {jdir, jsavedir; adir, asavedir};
             filedir = fullfile(jsavedir, birdname, 'screening_1');
             phenotype_by_day(filedir, savedir, birdname, 'juv')
         end
+        
+        %% Rhythm phenotype
+        
 
         %% Check on evsonganaly
 
