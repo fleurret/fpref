@@ -22,7 +22,7 @@ datadirs = {jdir, jsavedir; adir, asavedir};
         
         %% PhenotypeBird
 
-        phenotypebird_wrapper(subjs, datadirs, 'full')
+        phenotypebird_wrapper(subjs, sex, datadirs, 'full')
        
         %% PhenotypeBird each day
         
@@ -33,9 +33,7 @@ datadirs = {jdir, jsavedir; adir, asavedir};
             filedir = fullfile(jsavedir, birdname, 'screening_1');
             phenotype_by_day(filedir, savedir, birdname, 'juv')
         end
-        
-        %% Rhythm phenotype
-        
+       
 
         %% Check on evsonganaly
 
