@@ -108,7 +108,7 @@ for i = 1:length(subjs)
                                     ioi = [ioi durs];
                             end
                         end
-                        
+
                         % cv
                         cv = std(ioi)/mean(ioi);
 
@@ -165,40 +165,45 @@ for i = 1:length(subjs)
 
                 for t = 1:length(output)
 
-                    % plot hist
-                    F = figure;
-                    F.Position = [0, 0, 500, 300];
-                    ax = gca;
-                    hold on
-                    cm = [69,129,92]./255;
-                    [c, d] = ksdensity(output(t).ioi_ratios,'Bandwidth', 'plug-in');
-                    [pk, l, ~, pr] = findpeaks(c, d, MinPeakProminence=1);
+                    if isempty(output(t).ioi_ratios)
+                        continue
+                    else
 
-                    set(ax, 'TickDir', 'out',...
-                        'XTickLabelRotation', 0,...
-                        'TickLength', [0.02,0.02],...
-                        'LineWidth', 1.5);
-                    set(findobj(ax,'-property','FontName'),...
-                        'FontSize', 9,...
-                        'FontName','Arial')
-                    plot(d, (c./max(c))*max(histcounts(output(t).ioi_ratios, 50)),...
-                        'LineWidth', 1.5,...
-                        'Color','k');
-                    histogram(output(t).ioi_ratios, 50,...
-                        'FaceColor', cm,...
-                        'EdgeColor', 'none')
-                    xline(l,...
-                        'LineStyle', '--')
+                        % plot hist
+                        F = figure;
+                        F.Position = [0, 0, 500, 300];
+                        ax = gca;
+                        hold on
+                        cm = [69,129,92]./255;
+                        [c, d] = ksdensity(output(t).ioi_ratios,'Bandwidth', 'plug-in');
+                        [pk, l, ~, pr] = findpeaks(c, d, MinPeakProminence=1);
 
-                    title(append(birdname, ' ', output(t).vocalization))
-                    xlim([0 1])
-                    xticks([0.3333, 0.5, 0.6666])
-                    xticklabels({'1:2', '1:1', '2:1'})
-                    xlabel(ax, 'Rhythm ratio',...
-                        'FontWeight', 'bold')
-                    ylabel(ax,'Density',...
-                        'FontWeight', 'bold')
-                    set(ax,'Layer', 'Top')
+                        set(ax, 'TickDir', 'out',...
+                            'XTickLabelRotation', 0,...
+                            'TickLength', [0.02,0.02],...
+                            'LineWidth', 1.5);
+                        set(findobj(ax,'-property','FontName'),...
+                            'FontSize', 9,...
+                            'FontName','Arial')
+                        plot(d, (c./max(c))*max(histcounts(output(t).ioi_ratios, 50)),...
+                            'LineWidth', 1.5,...
+                            'Color','k');
+                        histogram(output(t).ioi_ratios, 50,...
+                            'FaceColor', cm,...
+                            'EdgeColor', 'none')
+                        xline(l,...
+                            'LineStyle', '--')
+
+                        title(append(birdname, ' ', output(t).vocalization))
+                        xlim([0 1])
+                        xticks([0.3333, 0.5, 0.6666])
+                        xticklabels({'1:2', '1:1', '2:1'})
+                        xlabel(ax, 'Rhythm ratio',...
+                            'FontWeight', 'bold')
+                        ylabel(ax,'Density',...
+                            'FontWeight', 'bold')
+                        set(ax,'Layer', 'Top')
+                    end
                 end
             end
         else

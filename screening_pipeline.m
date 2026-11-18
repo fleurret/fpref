@@ -1,5 +1,5 @@
 %% SET VARIABLES
-subjs = {'or14pu27'};
+subjs = {'or7pu70'};
 
 sex = 'male';
 callfilen = 500;
@@ -33,6 +33,10 @@ datadirs = {jdir, jsavedir; adir, asavedir};
             filedir = fullfile(jsavedir, birdname, 'screening_1');
             phenotype_by_day(filedir, savedir, birdname, 'juv')
         end
+
+        %% Rhythm
+
+        rhythm(subjs, sex, datadirs, 0)
        
 
         %% Check on evsonganaly
