@@ -1,4 +1,4 @@
-function rhythm(subjs, sex, datadirs,rerunflag)
+function rhythm(subjs, sex, datadirs, rerunflag)
 
 for i = 1:length(subjs)
     birdname = subjs{i};
@@ -41,16 +41,15 @@ for i = 1:length(subjs)
                                     idx = find(diff(onsets)<2);
                                     onsets(idx+1) = [];
                                     offsets(idx+1) = [];
-                                    labels(idx+1) = [];
-                                    gapdurs = (offsets(2:end)-onsets(1:end-1));
+                                    gapdurs = (onsets(2:end)-offsets(1:end-1));
 
-                                    shortdurs = find(gapdurs<350);
+                                    shortdurs = find(gapdurs < 350);
                                     onsets(shortdurs) = [];
-                                    longdurs = find(gapdurs>2500);
+                                    longdurs = find(gapdurs > 2500);
                                     onsets(longdurs) = [];
 
-                                    if ~isempty(onsets)
-                                        ioi = [ioi [diff(onsets)/1000]'];
+                                    if numel(onsets) > 1
+                                        ioi = [ioi [diff(onsets)]'];
                                     else
                                         continue
                                     end
@@ -109,6 +108,9 @@ for i = 1:length(subjs)
                                     ioi = [ioi durs];
                             end
                         end
+                        
+                        % cv
+                        cv = std(ioi)/mean(ioi);
 
                         % ioi ratios
                         r = [];
@@ -149,6 +151,7 @@ for i = 1:length(subjs)
                         output(t).birdname = birdname;
                         output(t).vocalization = vocalization;
                         output(t).iois = ioi;
+                        output(t).global_cv = cv;
                         output(t).ioi_ratios = r;
                         output(t).ioi_ratios_alt = r2;
                         % output(t).local_isochrony = score;
@@ -193,7 +196,7 @@ for i = 1:length(subjs)
                     xticklabels({'1:2', '1:1', '2:1'})
                     xlabel(ax, 'Rhythm ratio',...
                         'FontWeight', 'bold')
-                    ylabel(ax,'Frequency',...
+                    ylabel(ax,'Density',...
                         'FontWeight', 'bold')
                     set(ax,'Layer', 'Top')
                 end
