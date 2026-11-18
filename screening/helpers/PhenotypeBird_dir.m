@@ -22,7 +22,7 @@ for j=1:length(allfiles);
     onsets(idx+1)=[];
     offsets(idx+1)=[];
     labels(idx+1)=[];
-    gapdurs=(offsets(2:end)-onsets(1:end-1));
+    gapdurs = (onsets(2:end)-offsets(1:end-1));
 
     %       gapdurs=diff(onsets);
     %    isSong=checkforsong(onsets,offsets,8,350);
