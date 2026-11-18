@@ -38,8 +38,12 @@ for i = 1:length(subjs)
                     if ~exist(savedir)
                         mkdir(savedir)
                     end
-                    
-                    movefile(fullfile(screenings(k).folder, screenings(k).name, birdname), fullfile(savedir, screenings(k).name))
+
+                    if rerunflag == 1
+                        movefile(fullfile(screenings(k).folder, screenings(k).name, birdname), fullfile(savedir, append(screenings(k).name), '-rerun'))
+                    else
+                        movefile(fullfile(screenings(k).folder, screenings(k).name, birdname), fullfile(savedir, screenings(k).name))
+                    end
                 end
             end
         end

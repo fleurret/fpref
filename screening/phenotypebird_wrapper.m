@@ -1,4 +1,4 @@
-function phenotypebird_wrapper(subjs, sex, datadirs, version)
+function phenotypebird_wrapper(subjs, datadirs, version)
 
 for i = 1:length(subjs)
     birdname = subjs{i};
@@ -13,8 +13,6 @@ for i = 1:length(subjs)
             for k = 1:length(screenings)
                 cd(fullfile(screenings(k).folder, screenings(k).name))
                 fprintf('%s %s \n', screenings(k).folder, screenings(k).name)
-
-                rhythm(birdname, sex)
 
                 switch version
                     case 'full'
