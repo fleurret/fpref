@@ -1,13 +1,13 @@
 %% SET VARIABLES
-subjs = {'or7pu70'};
+subjs = {'rd68rd95'};
 
-sex = 'male';
-callfilen = 500;
-songfilen = 250;
-
-% sex = 'female';
+% sex = 'male';
 % callfilen = 500;
-% songfilen = 0;
+% songfilen = 250;
+
+sex = 'female';
+callfilen = 500;
+songfilen = 0;
 
 jdir = 'Y:\public\screening'; % juvenile screening data folder
 jsavedir = 'Y:\public\Juvenile_Call_Phenotyping'; % juvenile screening output folder
@@ -22,7 +22,7 @@ datadirs = {jdir, jsavedir; adir, asavedir};
         
         %% PhenotypeBird
 
-        phenotypebird_wrapper(subjs, sex, datadirs, 'full')
+        phenotypebird_wrapper(subjs, sex, datadirs, 'lite', 1)
        
         %% PhenotypeBird each day
         
