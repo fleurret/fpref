@@ -1,9 +1,9 @@
 %% SET VARIABLES
 
-birdname = 'rd68rd95';
+birdname = 'bu95bu15';
     %'wh26wh27'; %'or25rd67'; %'yw51gr72'; %'wh37gr58' 'or87yw46'; 'wh99pu92'
 savedir = 'Y:\Brainard\Analysis\Female preference';
-subf = 'pref_test';
+subf = 'pref_retest';
 
 %% EVSONGANALY
         sf = uigetdir(fullfile(savedir, birdname, subf));
@@ -20,7 +20,11 @@ subf = 'pref_test';
         % concat_data(savedir, type)
         % type: 'testing', 'pref_retest', 'tempo_test'
         
-        concat_data(savedir, 'pref_test')
+%         concat_data(savedir, 'pref_test')
+        
+        %% Add SI/dprime to relationship coefficient files
+        
+        rcoeff_preference(savedir)
 
 %% ANALYSIS -- STIMULUS PREFERENCE
         
@@ -83,17 +87,18 @@ subf = 'pref_test';
 %% GROUP LEVEL ANALYSIS
 
 cmlist = {'rd76bk40', 'rd68rd95', 'or25rd67', 'or87yw46', 'yw51gr72',...
-    'wh37gr58', 'bu95bu15', 'wh99pu92', 'wh26wh27'};
-cm = [96,9,9;... % rd62bk49
+    'wh37gr58', 'gr58bk43', 'bu95bu15', 'wh99pu92', 'wh26wh27'};
+cm = [60,9,9;... % rd76bk40
     155,13,13;... % rd68rd95
     221,93,54;... % or25rd67
     242,205,59;... % or87yw46
     197,230,86;... % yw51gr72
-    108,164,134;... % wh37gr58
+    90,200,130;... % wh37gr58
+    11,99,65;... % gr58bk43
     75,184,214;... % bu95bu15
     169,116,222;... % wh99pu92
     188,188,188]./255; % wh26wh27
-savedir = 'Y:\Brainard\Analysis\Female preference';
+savedir = 'X:\Brainard\Analysis\Female preference';
         
         %% Tempo phenotype v preferred stimulus tempo
         % plots correlation between call tempo/preferred tempo across birds
@@ -102,4 +107,11 @@ savedir = 'Y:\Brainard\Analysis\Female preference';
 
         %% Tempo phenotype v stimulus selectivity
         
-        selectivity_corr(savedir, cmlist, cm)
+        selectivity_corr2(savedir, cmlist, cm)
+        
+        %% Tempo phenotype v total calls
+        callamount_corr(savedir, cmlist, cm)
+        
+        %% Relationship coefficient v stimulus selectivity
+        
+        rcoeff_corr(savedir, cmlist, cm, 'dads')
