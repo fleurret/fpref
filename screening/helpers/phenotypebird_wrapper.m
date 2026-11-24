@@ -1,4 +1,4 @@
-function phenotypebird_wrapper(subjs, datadirs, version)
+function phenotypebird_wrapper(subjs, datadirs, version, rerunflag)
 
 for i = 1:length(subjs)
     birdname = subjs{i};
@@ -16,9 +16,9 @@ for i = 1:length(subjs)
 
                 switch version
                     case 'full'
-                        PhenotypeBird(birdname)
+                        PhenotypeBird(birdname, rerunflag)
                     case 'lite'
-                        PhenotypeBird_lite(birdname)
+                        PhenotypeBird_lite(birdname, rerunflag)
                 end
             end
         else

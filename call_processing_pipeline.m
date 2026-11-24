@@ -1,10 +1,10 @@
 %% SET VARIABLES
 
-birdname = 'rd3pu50';
-subf = 'pref_test';
+birdname = 'rd68rd95';
+subf = 'tempo_test';
 
-% birdname = 'bu95bu15';
-% subf = 'pref_retest';
+% birdname = 'rd76bk40';
+% subf = 'tempo_test';
 
 %'or25rd67', 'wh26wh27', 'wh37gr58', 'or87yw46', 'wh99pu92',
 % 'yw51gr72', 'rd76bk40', 'bu95bu15', 'rd68rd95'

@@ -1,5 +1,5 @@
 %% SET VARIABLES
-subjs = {'rd68rd95'};
+subjs = {'wh53pu44', 'bu7bu97', 'bu10bu100'};
 
 % sex = 'male';
 % callfilen = 500;
@@ -18,11 +18,11 @@ datadirs = {jdir, jsavedir; adir, asavedir};
 
         %% WhisperSeg
 
-        whisperseg_wrapper(subjs, sex, datadirs, callfilen, songfilen, 1)
+        whisperseg_wrapper(subjs, sex, datadirs, callfilen, songfilen, 0)
         
         %% PhenotypeBird
 
-        phenotypebird_wrapper(subjs, sex, datadirs, 'lite', 1)
+        phenotypebird_wrapper(subjs, datadirs, 'lite', 0)
        
         %% PhenotypeBird each day
         
@@ -36,7 +36,10 @@ datadirs = {jdir, jsavedir; adir, asavedir};
 
         %% Rhythm
 
-        rhythm(subjs, sex, datadirs, 0)
+        % rhythm(subjs, sex, datadirs, 0)
+
+        savedir = 'F:\rose\analysis\female preference';
+        call_similarity(subjs, datadirs, savedir, 2, 0)
        
 
         %% Check on evsonganaly
