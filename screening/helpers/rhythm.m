@@ -101,6 +101,10 @@ for i = 1:length(subjs)
                                             % a long syllable's own duration can never push an interval across a
                                             % between-bout boundary, and no cross-bout gap is ever included.
                                             durs = [durs reshape(diff(onsets(goodtrain)),1,[])];
+                                            
+                                            binary = zeros(1, stopbout);
+                                            binary(onsets) = 1;
+                                        end
 
                                         end
                                     end
