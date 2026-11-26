@@ -130,10 +130,17 @@ switch sv
                     quarterblock = (block_offset - block_onset)/4;
                     q = block_onset:quarterblock:block_offset;
                     
-                    blockdata(j,:).Q1Pct = (sum(calls <= q(2) & calls > q(1))/length(calls))*100;
-                    blockdata(j,:).Q2Pct = (sum(calls <= q(3) & calls > q(2))/length(calls))*100;
-                    blockdata(j,:).Q3Pct = (sum(calls <= q(4) & calls > q(3))/length(calls))*100;
-                    blockdata(j,:).Q4Pct = (sum(calls <= q(5) & calls > q(4))/length(calls))*100;
+                    if ~isempty(calls)
+                        blockdata(j,:).Q1Pct = (sum(calls <= q(2) & calls > q(1))/length(calls))*100;
+                        blockdata(j,:).Q2Pct = (sum(calls <= q(3) & calls > q(2))/length(calls))*100;
+                        blockdata(j,:).Q3Pct = (sum(calls <= q(4) & calls > q(3))/length(calls))*100;
+                        blockdata(j,:).Q4Pct = (sum(calls <= q(5) & calls > q(4))/length(calls))*100;
+                    else
+                        blockdata(j,:).Q1Pct = NaN;
+                        blockdata(j,:).Q2Pct = NaN;
+                        blockdata(j,:).Q3Pct = NaN;
+                        blockdata(j,:).Q4Pct = NaN;
+                    end
                     
                     % add postblock calls to the right place
                     postblockcalls = length(call_onsets(call_onsets > block_offset));
